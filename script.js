@@ -72,6 +72,7 @@ if (form) {
 
 // ===============================
 // RESUME DOWNLOAD BUTTONS (Automatic download for PDF & PNG)
+// DOCX uses HTML download attribute, no JS needed
 // ===============================
 async function forceDownload(filePath) {
   try {
@@ -103,3 +104,29 @@ document.getElementById('downloadImage')?.addEventListener('click', () => {
   forceDownload('downloads/resumeimg.png');
 });
 
+// ===============================
+// RESUME DOWNLOAD BUTTONS (Automatic download)
+// Only for DOCX to force download in all browsers
+// ===============================
+document.getElementById('downloadDOCX')?.addEventListener('click', function (e) {
+  e.preventDefault(); // prevent default link behavior
+  const filePath = 'downloads/resumedocx.docx'; // path to your docx
+  fetch(filePath)
+    .then(resp => {
+      if (!resp.ok) throw new Error('File not found');
+      return resp.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'resumedocx.docx';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(err => {
+      alert('Error downloading file: ' + err);
+    });
+});
