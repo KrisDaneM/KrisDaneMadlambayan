@@ -1893,8 +1893,8 @@ body.dark .view-btn {
 }
 
 body.dark .view-btn:hover {
-  background-color: #0D5390;
-  color: #ffffff;
+  background-color: #facc15;
+  color: #0D5390;
 }
 
 
@@ -1934,6 +1934,15 @@ body.dark .view-btn:hover {
   color: #0b2e4f;
 }
 
+body.dark .download-btn {
+  background: #ffffff;
+  color: #0b2e4f;
+}
+
+body.dark .download-btn:hover {
+  background: #facc15;
+  color: #0b2e4f;
+}
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
