@@ -130,3 +130,49 @@ document.getElementById('downloadDOCX')?.addEventListener('click', function (e) 
       alert('Error downloading file: ' + err);
     });
 });
+
+// Scroll animation for Thryve pages that reappears on scroll
+const pageSections = document.querySelectorAll('.page-section');
+
+const observerOptions = {
+  threshold: 0.2 // trigger when 20% of section is visible
+};
+
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('show');   // appear
+    } else {
+      entry.target.classList.remove('show'); // disappear when scrolled out
+    }
+  });
+}, observerOptions);
+
+pageSections.forEach(section => {
+  sectionObserver.observe(section);
+});
+
+
+// LIGHTBOX FUNCTIONALITY
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.querySelector('.lightbox-img');
+const lightboxClose = document.querySelector('.lightbox-close');
+
+document.querySelectorAll('.page-section img').forEach(img => {
+  img.addEventListener('click', () => {
+    lightbox.style.display = 'flex';
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+  });
+});
+
+lightboxClose.addEventListener('click', () => {
+  lightbox.style.display = 'none';
+});
+
+// Close lightbox when clicking outside the image
+lightbox.addEventListener('click', (e) => {
+  if (e.target === lightbox) {
+    lightbox.style.display = 'none';
+  }
+});
