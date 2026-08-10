@@ -8,6 +8,23 @@
     <meta name="google-site-verification" content="pCZnc5cDUrkdgndd0suCn599u-Hs4ZGvuYmlvNHGmaI" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
     <title>Kris Dane Madlambayan | Web Developer Portfolio</title>
+    <style>
+      .skip-link{position:fixed;top:0;left:12px;z-index:10000;transform:translateY(-200%)}
+      .skip-link:focus,.skip-link:focus-visible{transform:translateY(12px)}
+    </style>
+    <script>
+      (() => {
+        const key = 'portfolio-theme';
+        let saved = null;
+        try { saved = localStorage.getItem(key); } catch { /* Storage may be unavailable. */ }
+        const theme = saved === 'light' || saved === 'dark'
+          ? saved
+          : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f7f2ea' : '#080808';
+      })();
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>

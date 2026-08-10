@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 const links = [
   { path: '/', label: 'Home' },
@@ -62,6 +63,7 @@ export default function Navbar() {
         <div className="orbit-menu-links">
           {links.map(({ path, label }, index) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'active' : ''}><span>0{index + 1}</span><strong>{label}</strong><i aria-hidden="true" /></NavLink>)}
         </div>
+        <ThemeToggle />
         <p>Use the orbit arrows to move through the portfolio in sequence.</p>
       </div>
     </header>
