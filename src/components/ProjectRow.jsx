@@ -2,11 +2,12 @@ import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function ProjectRow({ project, compact = false }) {
+  const titleClass = project.title.length > 9 ? 'project-title project-title--long' : 'project-title';
   return <article className={`work-row${compact ? ' work-row-compact' : ''}`}>
     <span className="work-row-number" aria-hidden="true">{project.id}</span>
     <div className="work-row-copy">
       <p>{project.category}</p>
-      <h3><Link to={`/projects/${project.slug}`}>{project.title}</Link></h3>
+      <h3 className={titleClass}><Link to={`/projects/${project.slug}`}>{project.title}</Link></h3>
       <p className="work-row-description">{project.description}</p>
     </div>
     <div className="work-row-meta"><span>{project.type}</span><p>{project.stack.join(' / ')}</p></div>

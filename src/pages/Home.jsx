@@ -46,6 +46,6 @@ export default function Home() {
 
     <section className="home-about-teaser"><div className="container editorial-grid"><div className="vertical-label">03 / About</div><Reveal className="home-about-statement"><span>Bachelor of Science in Information Technology</span><h2>Learning through building.<br />Refining through design.</h2><p>I&apos;m an Information Technology student at Holy Angel University focused primarily on front-end development, with experience across back-end tools and interface design.</p><Link to="/about">Read my story <ArrowRight /></Link></Reveal><div className="about-coordinate" aria-hidden="true">KDM / PAMPANGA<br />PHILIPPINES</div></div></section>
 
-    <section className="home-contact"><div className="container"><Reveal><span>04 / Continue</span><p>Next page in the sequence</p><Link to="/contact">Let&apos;s build<br /><em>something.</em><ArrowRight /></Link></Reveal></div></section>
+    <section className="home-contact"><div className="container"><Reveal><span>04 / Continue</span><p>Next page in the sequence</p><Link to="/contact"><strong>Let&apos;s build<br /><em>something.</em></strong><ArrowRight /></Link></Reveal></div></section>
   </PageShell>;
 }
