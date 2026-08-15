@@ -817,13 +817,33 @@ main,main section,main .container { max-width:100%; }
 .assistant-header button:hover { color:var(--orange); border-color:var(--orange); }
 .assistant-description { margin:0; padding:12px 18px; border-bottom:1px solid var(--border); color:var(--subtle); font-size:.7rem; line-height:1.55; }
 .assistant-conversation { min-height:0; flex:1; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; padding:16px; scrollbar-width:thin; scrollbar-color:var(--subtle) transparent; }
-.assistant-message { width:min(88%,320px); margin-bottom:14px; }
+.assistant-message { width:min(94%,350px); margin-bottom:14px; }
 .assistant-message > span { display:block; margin-bottom:4px; color:var(--subtle); font-size:.5rem; font-weight:800; letter-spacing:.13em; }
 .assistant-message p { margin:0; padding:10px 12px; border:1px solid var(--border); border-radius:4px 13px 13px 13px; color:var(--muted); background:var(--surface); font-size:.75rem; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+.assistant-markdown { padding:10px 12px; border:1px solid var(--border); border-radius:4px 13px 13px 13px; color:var(--muted); background:var(--surface); font-size:.75rem; line-height:1.58; overflow-wrap:anywhere; }
+.assistant-markdown > :first-child { margin-top:0; }
+.assistant-markdown > :last-child { margin-bottom:0; }
+.assistant-markdown p { margin:0 0 9px; padding:0; border:0; border-radius:0; color:inherit; background:transparent; font:inherit; line-height:inherit; white-space:normal; }
+.assistant-markdown strong { color:var(--text); font-weight:700; }
+.assistant-markdown em { color:var(--text); }
+.assistant-markdown h1,.assistant-markdown h2,.assistant-markdown h3,.assistant-markdown h4 { margin:12px 0 6px; color:var(--text); font:650 .82rem/1.35 'Space Grotesk'; }
+.assistant-markdown ul,.assistant-markdown ol { margin:0 0 9px; padding-left:19px; }
+.assistant-markdown li { margin:3px 0; padding-left:2px; }
+.assistant-markdown li::marker { color:var(--orange); }
+.assistant-markdown a { color:var(--orange-3); font-weight:650; text-decoration:underline; text-decoration-color:color-mix(in srgb,var(--orange) 45%,transparent); text-underline-offset:3px; }
+.assistant-markdown a:hover,.assistant-markdown a:focus-visible { color:var(--orange); text-decoration-color:currentColor; }
+.assistant-markdown code { padding:1px 4px; border:1px solid var(--border); border-radius:4px; color:var(--text); background:var(--input); font:.68rem/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+.assistant-markdown pre { max-width:100%; margin:0 0 9px; padding:9px; overflow-x:auto; border:1px solid var(--border); border-radius:7px; background:var(--input); }
+.assistant-markdown pre code { padding:0; border:0; background:transparent; white-space:pre; overflow-wrap:normal; }
+.assistant-markdown blockquote { margin:0 0 9px; padding-left:10px; border-left:2px solid var(--orange); color:var(--subtle); }
+.assistant-table-wrap { width:100%; margin:0 0 9px; overflow-x:auto; }
+.assistant-table-wrap table { width:max-content; min-width:100%; border-collapse:collapse; font-size:.68rem; }
+.assistant-table-wrap th,.assistant-table-wrap td { padding:6px 8px; border:1px solid var(--border); text-align:left; vertical-align:top; }
+.assistant-table-wrap th { color:var(--text); background:var(--surface-hover); }
 .assistant-message.is-user { margin-left:auto; text-align:right; }
 .assistant-message.is-user > span { color:var(--orange-3); }
 .assistant-message.is-user p { border-color:color-mix(in srgb,var(--orange) 34%,var(--border)); border-radius:13px 4px 13px 13px; color:var(--text); background:var(--surface-hover); text-align:left; }
-.assistant-message.is-error p { color:var(--muted); border-color:color-mix(in srgb,var(--orange) 42%,var(--border)); }
+.assistant-message.is-error .assistant-markdown { color:var(--muted); border-color:color-mix(in srgb,var(--orange) 42%,var(--border)); }
 .assistant-suggestions { display:grid; gap:7px; margin-top:5px; }
 .assistant-suggestions button { width:100%; min-height:36px; padding:8px 10px; border:1px solid var(--border); border-radius:9px; color:var(--muted); background:transparent; cursor:pointer; font-size:.68rem; line-height:1.4; text-align:left; transition:color .18s ease,border-color .18s ease,background-color .18s ease; }
 .assistant-suggestions button:hover,.assistant-suggestions button:focus-visible { color:var(--orange-3); border-color:color-mix(in srgb,var(--orange) 48%,var(--border)); background:var(--surface-hover); }

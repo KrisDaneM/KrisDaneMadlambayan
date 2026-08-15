@@ -1,5 +1,8 @@
 import { ArrowUp, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { askPortfolioAssistant } from '../services/aiService';
 
 const INTRO_MESSAGE = {
@@ -18,6 +21,15 @@ const SUGGESTED_QUESTIONS = [
 ];
 
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+const markdownComponents = {
+  a: ({ href = '', children }) => {
+    if (href.startsWith('/')) return <Link to={href}>{children}</Link>;
+    const external = /^https?:\/\//i.test(href);
+    return <a href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>{children}</a>;
+  },
+  table: ({ children }) => <div className="assistant-table-wrap"><table>{children}</table></div>,
+};
 
 export default function PortfolioAssistant() {
   const [mounted, setMounted] = useState(false);
@@ -223,7 +235,13 @@ export default function PortfolioAssistant() {
             {messages.map((message) => (
               <div className={`assistant-message is-${message.role}${message.error ? ' is-error' : ''}`} key={message.id}>
                 <span>{message.role === 'assistant' ? 'KDM' : 'YOU'}</span>
-                <p>{message.content}</p>
+                {message.role === 'assistant' ? (
+                  <div className="assistant-markdown">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
+                ) : <p>{message.content}</p>}
               </div>
             ))}
 

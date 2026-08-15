@@ -42,6 +42,9 @@ export function buildPortfolioContext() {
 }
 
 export function buildQuestionGroundingGuard(message) {
+  if (/kathryn\s+bernardo/i.test(message)) {
+    return `Kathryn Bernardo is in scope only because the approved public profile identifies her as Kris's celebrity crush. Answer this question briefly in the visitor's language and keep it connected to Kris. Do not provide general celebrity biography or invent additional facts. A suitable English answer is: “Kathryn Bernardo is the celebrity crush listed in Kris's public profile.” A suitable Filipino answer is: “Si Kathryn Bernardo ang celebrity crush na nakalista sa public profile ni Kris.”`;
+  }
   if (/ac[-\s]?core/i.test(message)) {
     const project = projects.find(({ slug }) => slug === 'ac-core');
     return `AC-CORE grounding for this answer: identify it as a group project by MMPA Works. Kris's role is “${project?.role}”. If discussing his contribution, stay within this exact verified statement: “${project?.contribution}” Do not replace “focused on” or “contributing to” with designed, implemented, built, owned, led, or created.`;
