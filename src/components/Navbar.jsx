@@ -74,7 +74,7 @@ export default function Navbar() {
         <button className="orbit-arrow orbit-next" type="button" aria-label="Next page" onClick={() => move(1)}><ChevronRight /></button>
       </nav>
       <button className={`orbit-menu-backdrop ${open ? 'is-open' : ''}`} type="button" aria-label="Close navigation" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
-      <div ref={menuRef} id="orbit-menu" className={`orbit-menu ${open ? 'is-open' : ''}`} aria-hidden={!open} inert={open ? undefined : ''}>
+      <div ref={menuRef} id="orbit-menu" className={`orbit-menu ${open ? 'is-open' : ''}`} aria-hidden={!open} inert={!open}>
         <NavLink to="/" className="orbit-menu-brand" aria-label="KDM home" onClick={() => setOpen(false)}>KDM<span>.</span></NavLink>
         <div className="orbit-menu-head"><span>Navigate / KDM</span><button type="button" onClick={() => setOpen(false)} aria-label="Close navigation"><X /></button></div>
         <div className="orbit-menu-links">
