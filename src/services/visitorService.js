@@ -1,5 +1,15 @@
 const VISITOR_ID_KEY = 'kdm_portfolio_visitor_id';
 let registrationPromise;
+let metricsPromise;
+const projectViewPromises = new Map();
+
+async function parseMetricsResponse(response, failureMessage) {
+  if (!response.ok) throw new Error(failureMessage);
+  const data = await response.json();
+  const keys = ['totalViews', 'uniqueVisitors', 'projectViews', 'resumeDownloads'];
+  if (!keys.every((key) => Number.isFinite(data[key]))) throw new Error('Invalid visitor metrics response.');
+  return data;
+}
 
 function createAnonymousId() {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
@@ -28,10 +38,40 @@ export function registerPortfolioVisit() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ visitorId: getAnonymousVisitorId() }),
-    }).then(async (response) => {
-      if (!response.ok) throw new Error('Visitor registration failed.');
-      return response.json();
-    });
+    }).then((response) => parseMetricsResponse(response, 'Visitor registration failed.'));
   }
   return registrationPromise;
+}
+
+export function getPortfolioMetrics() {
+  if (!metricsPromise) {
+    metricsPromise = fetch('/api/visitors', { headers: { Accept: 'application/json' } })
+      .then((response) => parseMetricsResponse(response, 'Visitor metrics request failed.'))
+      .catch((error) => {
+        metricsPromise = undefined;
+        throw error;
+      });
+  }
+  return metricsPromise;
+}
+
+export function trackProjectView(slug) {
+  if (!projectViewPromises.has(slug)) {
+    const request = fetch('/api/visitors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'project-view', slug }),
+    })
+      .then((response) => parseMetricsResponse(response, 'Project view tracking failed.'))
+      .then((metrics) => {
+        metricsPromise = Promise.resolve(metrics);
+        return metrics;
+      })
+      .catch((error) => {
+        projectViewPromises.delete(slug);
+        throw error;
+      });
+    projectViewPromises.set(slug, request);
+  }
+  return projectViewPromises.get(slug);
 }

@@ -2,6 +2,8 @@ import { ArrowDown, ArrowRight, Download } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import AmbientField from '../components/AmbientField';
+import LiveMetrics from '../components/LiveMetrics';
+import ProofOfWork from '../components/ProofOfWork';
 import PageShell from '../components/PageShell';
 import ProjectRow from '../components/ProjectRow';
 import Reveal from '../components/Reveal';
@@ -38,14 +40,18 @@ export default function Home() {
       </div>
     </section>
 
+    <LiveMetrics />
+
     <section className="manifesto-section" id="manifesto"><div className="container editorial-grid"><div className="vertical-label">00 / Manifesto</div><Reveal className="manifesto-copy"><p>I care about the space where</p><h2><em>code</em> becomes experience.</h2><p>My work combines front-end development, visual systems, and user-centered thinking to make interfaces that are clear, useful, and considered.</p></Reveal><Reveal className="manifesto-note"><span>Approach</span><p>Professional first.<br />Creative with intent.<br />Always learning.</p></Reveal></div></section>
 
-    <section className="home-work" id="featured"><div className="container"><div className="editorial-heading"><div><span>01 / 04</span><p>Selected work</p></div><h2>Digital products with a clear reason to exist.</h2><Link to="/projects">Full project index <ArrowRight /></Link></div><div className="work-list work-list-selected">{featuredProjects.map((project, index) => <Reveal key={project.slug} delay={index * .06}><ProjectRow project={project} compact /></Reveal>)}</div></div></section>
+    <section className="home-work" id="featured"><div className="container"><div className="editorial-heading"><div><span>01 / 05</span><p>Selected work</p></div><h2>Digital products with a clear reason to exist.</h2><Link to="/projects">Full project index <ArrowRight /></Link></div><div className="work-list work-list-selected">{featuredProjects.map((project, index) => <Reveal key={project.slug} delay={index * .06}><ProjectRow project={project} compact number={String(index + 1).padStart(2, '0')} /></Reveal>)}</div></div></section>
 
-    <section className="capability-index"><div className="container"><div className="editorial-heading"><div><span>02 / 04</span><p>Capabilities</p></div><h2>A technical toolkit organized around outcomes.</h2></div><div className="capability-rows">{capabilityGroups.map((group) => <Reveal className="capability-row" key={group.title}><span>{group.number}</span><h3>{group.title}</h3><div>{group.items.map((item) => <span key={item}>{item}</span>)}</div></Reveal>)}</div><p className="capability-footnote">Also represented across current work: {skills.filter((skill) => !capabilityGroups.some((group) => group.items.includes(skill))).join(' / ')}</p></div></section>
+    <ProofOfWork />
 
-    <section className="home-about-teaser"><div className="container editorial-grid"><div className="vertical-label">03 / About</div><Reveal className="home-about-statement"><span>Bachelor of Science in Information Technology</span><h2>Learning through building.<br />Refining through design.</h2><p>I&apos;m an Information Technology student at Holy Angel University focused primarily on front-end development, with experience across back-end tools and interface design.</p><Link to="/about">Read my story <ArrowRight /></Link></Reveal><div className="about-coordinate" aria-hidden="true">KDM / PAMPANGA<br />PHILIPPINES</div></div></section>
+    <section className="capability-index"><div className="container"><div className="editorial-heading"><div><span>03 / 05</span><p>Capabilities</p></div><h2>A technical toolkit organized around outcomes.</h2></div><div className="capability-rows">{capabilityGroups.map((group) => <Reveal className="capability-row" key={group.title}><span>{group.number}</span><h3>{group.title}</h3><div>{group.items.map((item) => <span key={item}>{item}</span>)}</div></Reveal>)}</div><p className="capability-footnote">Also represented across current work: {skills.filter((skill) => !capabilityGroups.some((group) => group.items.includes(skill))).join(' / ')}</p></div></section>
 
-    <section className="home-contact"><div className="container"><Reveal><span>04 / Continue</span><p>Next page in the sequence</p><Link to="/contact"><strong>Let&apos;s build<br /><em>something.</em></strong><ArrowRight /></Link></Reveal></div></section>
+    <section className="home-about-teaser"><div className="container editorial-grid"><div className="vertical-label">04 / About</div><Reveal className="home-about-statement"><span>Bachelor of Science in Information Technology</span><h2>Learning through building.<br />Refining through design.</h2><p>I&apos;m an Information Technology student at Holy Angel University focused primarily on front-end development, with experience across back-end tools and interface design.</p><Link to="/about">Read my story <ArrowRight /></Link></Reveal><div className="about-coordinate" aria-hidden="true">KDM / PAMPANGA<br />PHILIPPINES</div></div></section>
+
+    <section className="home-contact"><div className="container"><Reveal><span>05 / Continue</span><p>Next page in the sequence</p><Link to="/contact"><strong>Let&apos;s build<br /><em>something.</em></strong><ArrowRight /></Link></Reveal></div></section>
   </PageShell>;
 }

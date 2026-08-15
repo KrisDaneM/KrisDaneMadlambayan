@@ -23,6 +23,29 @@ function parseVisitorId(body) {
   return visitorId;
 }
 
+function parseProjectView(body) {
+  let payload = body;
+  if (typeof body === 'string') {
+    try { payload = JSON.parse(body); } catch { return null; }
+  }
+  if (payload?.event !== 'project-view' || typeof payload.slug !== 'string') return null;
+  const slug = payload.slug.trim();
+  return /^[a-z0-9-]{2,80}$/.test(slug) ? slug : null;
+}
+
+async function registerProjectView(database) {
+  const metrics = await database.collection('metrics').findOneAndUpdate(
+    { _id: METRICS_ID },
+    {
+      $inc: { projectViews: 1 },
+      $set: { updatedAt: new Date() },
+      $setOnInsert: { totalViews: 0, uniqueVisitors: 0, resumeDownloads: 0 },
+    },
+    { upsert: true, returnDocument: 'after' },
+  );
+  return publicMetrics(metrics);
+}
+
 async function registerVisitor(database, visitorId) {
   const visitors = database.collection('visitors');
   const metrics = database.collection('metrics');
@@ -71,6 +94,9 @@ export default async function handler(request, response) {
       return response.status(200).json(publicMetrics(metrics));
     }
     if (request.method === 'POST') {
+      if (parseProjectView(request.body)) {
+        return response.status(200).json(await registerProjectView(database));
+      }
       const visitorId = parseVisitorId(request.body);
       if (!visitorId) return response.status(400).json({ error: 'A valid visitorId is required.' });
       return response.status(200).json(await registerVisitor(database, visitorId));
