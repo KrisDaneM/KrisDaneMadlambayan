@@ -5,6 +5,18 @@ export const socialLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/kris.dane.98/about' },
 ];
 
+export const portfolioProfile = {
+  name: 'Kris Dane Madlambayan',
+  roles: ['Web Developer', 'Front-End Developer', 'Creative Technologist'],
+  summary: 'An Information Technology student focused on responsive, accessible, and thoughtfully designed digital products, with experience across front-end development, back-end tools, databases, and interface design.',
+  education: 'Bachelor of Science in Information Technology, Holy Angel University (2023 — Present)',
+  location: 'San Fernando City, Pampanga, Philippines',
+  email: 'krisdane1234@gmail.com',
+  gender: 'Male',
+  interests: ['Basketball'],
+  celebrityCrush: 'Kathryn Bernardo',
+};
+
 export const skills = [
   'HTML', 'CSS', 'JavaScript', 'Vue.js', 'Node.js', 'Express', 'MongoDB',
   'Angular', 'TypeScript', 'PHP', 'Responsive Design', 'UI Design', 'UX Design',
