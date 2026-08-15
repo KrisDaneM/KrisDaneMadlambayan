@@ -15,15 +15,24 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const coreRef = useRef(null);
   const menuRef = useRef(null);
+  const lockedScrollY = useRef(0);
   const { pathname } = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
   useEffect(() => {
-    document.body.classList.toggle('menu-open', open);
+    const mobile = window.matchMedia('(max-width: 600px)').matches;
+    const didLockScroll = open && mobile;
+    if (didLockScroll) {
+      lockedScrollY.current = window.scrollY;
+      document.body.classList.add('menu-open');
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${lockedScrollY.current}px`;
+      document.body.style.width = '100%';
+    }
     const focusTimer = open
-      ? window.setTimeout(() => menuRef.current?.querySelector('a')?.focus(), 80)
+      ? window.setTimeout(() => menuRef.current?.querySelector('.orbit-menu-links a')?.focus(), 80)
       : undefined;
     const close = (event) => {
       if (event.key === 'Escape' && open) {
@@ -34,7 +43,13 @@ export default function Navbar() {
     window.addEventListener('keydown', close);
     return () => {
       if (focusTimer) window.clearTimeout(focusTimer);
-      document.body.classList.remove('menu-open');
+      if (didLockScroll) {
+        document.body.classList.remove('menu-open');
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, lockedScrollY.current);
+      }
       window.removeEventListener('keydown', close);
     };
   }, [open]);
@@ -46,7 +61,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="orbit-navigation">
+    <header className={`orbit-navigation ${open ? 'is-menu-open' : ''}`}>
       <NavLink to="/" className="kdm-signature" aria-label="KDM home">KDM<span>.</span></NavLink>
       <nav className={`route-orbit ${open ? 'is-open' : ''}`} aria-label="Primary navigation">
         <div className="orbit-ring" aria-hidden="true"><span /><span /><span /></div>
@@ -58,13 +73,16 @@ export default function Navbar() {
         </button>
         <button className="orbit-arrow orbit-next" type="button" aria-label="Next page" onClick={() => move(1)}><ChevronRight /></button>
       </nav>
-      <div ref={menuRef} id="orbit-menu" className={`orbit-menu ${open ? 'is-open' : ''}`} aria-hidden={!open}>
-        <div className="orbit-menu-head"><span>Navigate / KDM</span><button type="button" onClick={() => setOpen(false)} aria-label="Close expanded navigation"><X /></button></div>
+      <button className={`orbit-menu-backdrop ${open ? 'is-open' : ''}`} type="button" aria-label="Close navigation" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
+      <div ref={menuRef} id="orbit-menu" className={`orbit-menu ${open ? 'is-open' : ''}`} aria-hidden={!open} inert={open ? undefined : ''}>
+        <NavLink to="/" className="orbit-menu-brand" aria-label="KDM home" onClick={() => setOpen(false)}>KDM<span>.</span></NavLink>
+        <div className="orbit-menu-head"><span>Navigate / KDM</span><button type="button" onClick={() => setOpen(false)} aria-label="Close navigation"><X /></button></div>
         <div className="orbit-menu-links">
-          {links.map(({ path, label }, index) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'active' : ''}><span>0{index + 1}</span><strong>{label}</strong><i aria-hidden="true" /></NavLink>)}
+          {links.map(({ path, label }, index) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setOpen(false)}><span>0{index + 1}</span><strong>{label}</strong><i aria-hidden="true" /></NavLink>)}
         </div>
         <ThemeToggle />
         <p>Use the orbit arrows to move through the portfolio in sequence.</p>
+        <small className="orbit-menu-footer">KDM / Portfolio 2026</small>
       </div>
     </header>
   );
