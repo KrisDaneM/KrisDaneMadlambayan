@@ -9,7 +9,11 @@ export default [
   reactHooks.configs['recommended-latest'],
   reactRefresh.configs.vite,
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['api/**/*.js'],
+    languageOptions: { ecmaVersion: 2020, globals: globals.node, parserOptions: { ecmaVersion: 'latest', sourceType: 'module' } },
+  },
+  {
+    files: ['src/**/*.{js,jsx}'],
     languageOptions: { ecmaVersion: 2020, globals: globals.browser, parserOptions: { ecmaVersion: 'latest', ecmaFeatures: { jsx: true }, sourceType: 'module' } },
     rules: { 'no-unused-vars': ['error', { varsIgnorePattern: '^(motion|Icon|[A-Z_])', argsIgnorePattern: '^[A-Z_]' }] },
   },
