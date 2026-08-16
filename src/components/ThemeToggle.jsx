@@ -20,12 +20,14 @@ export default function ThemeToggle() {
     followsSystem.current = saved !== 'light' && saved !== 'dark';
   }
 
-  function applyVisualTheme(next) {
+  function applyThemeTokens(next) {
     const root = document.documentElement;
     root.dataset.theme = next;
     root.style.colorScheme = next;
+  }
+
+  function updateBrowserTheme(next) {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'light' ? '#f7f2ea' : '#080808');
-    flushSync(() => setTheme(next));
   }
 
   function persistTheme(next) {
@@ -38,9 +40,8 @@ export default function ThemeToggle() {
     const followSystem = (event) => {
       if (followsSystem.current) {
         const next = event.matches ? 'light' : 'dark';
-        document.documentElement.dataset.theme = next;
-        document.documentElement.style.colorScheme = next;
-        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'light' ? '#f7f2ea' : '#080808');
+        applyThemeTokens(next);
+        updateBrowserTheme(next);
         setTheme(next);
       }
     };
@@ -56,30 +57,27 @@ export default function ThemeToggle() {
     const next = theme === 'dark' ? 'light' : 'dark';
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion || typeof document.startViewTransition !== 'function') {
-      applyVisualTheme(next);
+      applyThemeTokens(next);
+      updateBrowserTheme(next);
+      setTheme(next);
       persistTheme(next);
       return;
     }
 
     isTransitioning.current = true;
     if (buttonRef.current) buttonRef.current.disabled = true;
+    // Move the control immediately; keep React work out of the snapshot callback.
+    flushSync(() => setTheme(next));
     document.documentElement.classList.add('theme-transitioning');
-    let persisted = false;
-    const persistOnce = () => {
-      if (persisted) return;
-      persisted = true;
-      persistTheme(next);
-    };
     try {
-      const transition = document.startViewTransition(() => applyVisualTheme(next));
-      transition.ready.then(
-        persistOnce,
-        persistOnce,
-      );
+      const transition = document.startViewTransition(() => applyThemeTokens(next));
       await transition.finished;
+      updateBrowserTheme(next);
+      persistTheme(next);
     } catch {
-      if (getCurrentTheme() !== next) applyVisualTheme(next);
-      persistOnce();
+      if (getCurrentTheme() !== next) applyThemeTokens(next);
+      updateBrowserTheme(next);
+      persistTheme(next);
     } finally {
       document.documentElement.classList.remove('theme-transitioning');
       isTransitioning.current = false;
@@ -91,7 +89,7 @@ export default function ThemeToggle() {
   return <>
     <div className="appearance-control">
       <span className="appearance-label">Appearance</span>
-      <button ref={buttonRef} className="universe-switch" type="button" role="switch" aria-checked={light} aria-label={`Switch to ${light ? 'dark' : 'light'} mode`} onClick={toggleTheme}>
+      <button ref={buttonRef} className={`universe-switch${light ? ' is-light' : ''}`} type="button" role="switch" aria-checked={light} aria-label={`Switch to ${light ? 'dark' : 'light'} mode`} onClick={toggleTheme}>
         <span className="universe-icon universe-moon" aria-hidden="true"><Moon /></span>
         <span className="universe-track" aria-hidden="true"><i /></span>
         <span className="universe-icon universe-sun" aria-hidden="true"><Sun /></span>
