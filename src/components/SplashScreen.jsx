@@ -1,16 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 const STORAGE_KEY = 'kdm_splash_seen';
-const TYPE_STEPS = [
-  { at: 90, value: 'K' },
-  { at: 195, value: 'KD' },
-  { at: 305, value: 'KDM' },
-  { at: 440, value: 'KDM.' },
-];
 const PROGRESS_START = 400;
-const PROGRESS_DURATION = 1450;
-const EXIT_START = 1930;
-const EXIT_DURATION = 520;
+const PROGRESS_DURATION = 1350;
+const EXIT_START = 1780;
+const FONT_READY_GRACE = 180;
+const EXIT_SAFETY_DURATION = 750;
 
 let showOnThisPageLoad = true;
 try {
@@ -21,14 +16,26 @@ try {
 
 const easeOutCubic = (value) => 1 - ((1 - value) ** 3);
 
+const SplashLogo = memo(function SplashLogo() {
+  return (
+    <div className="kdm-splash-logo" aria-hidden="true">
+      <span className="kdm-splash-char">K</span>
+      <span className="kdm-splash-char">D</span>
+      <span className="kdm-splash-char">M</span>
+      <span className="kdm-splash-char kdm-splash-dot">.</span>
+      <i className="kdm-splash-cursor" />
+    </div>
+  );
+});
+
 export default function SplashScreen() {
   const [visible, setVisible] = useState(showOnThisPageLoad);
-  const [typedLogo, setTypedLogo] = useState('');
   const [progress, setProgress] = useState(1);
   const [exiting, setExiting] = useState(false);
   const startedAt = useRef(null);
   const frame = useRef(null);
   const exitTimer = useRef(null);
+  const exitStarted = useRef(false);
   const lastProgress = useRef(1);
   const canPointerSkip = useRef(false);
 
@@ -39,25 +46,23 @@ export default function SplashScreen() {
       // The module-level flag still prevents a replay during this app lifecycle.
     }
     showOnThisPageLoad = false;
-    document.documentElement.classList.add('splash-active');
-
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     if (reducedMotion) {
-      setTypedLogo('KDM.');
       setProgress(100);
-      const reducedTimer = window.setTimeout(() => setVisible(false), 220);
+      const reducedTimer = window.setTimeout(() => setVisible(false), 160);
       return () => {
         window.clearTimeout(reducedTimer);
-        document.documentElement.classList.remove('splash-active');
       };
     }
 
+    let fontsReady = !document.fonts;
+    document.fonts?.ready.then(() => { fontsReady = true; }).catch(() => { fontsReady = true; });
+
     const skip = () => {
-      if (exitTimer.current !== null) return;
-      setTypedLogo('KDM.');
+      if (exitStarted.current) return;
+      exitStarted.current = true;
       setProgress(100);
       setExiting(true);
-      exitTimer.current = window.setTimeout(() => setVisible(false), EXIT_DURATION);
     };
     const onKeyDown = (event) => {
       if (event.key === 'Escape' || event.key === 'Enter') skip();
@@ -68,8 +73,6 @@ export default function SplashScreen() {
     const animate = (timestamp) => {
       if (startedAt.current === null) startedAt.current = timestamp;
       const elapsed = timestamp - startedAt.current;
-      const typeStep = TYPE_STEPS.findLast(({ at }) => elapsed >= at);
-      if (typeStep) setTypedLogo((current) => current === typeStep.value ? current : typeStep.value);
 
       if (elapsed >= PROGRESS_START) {
         const linear = Math.min((elapsed - PROGRESS_START) / PROGRESS_DURATION, 1);
@@ -80,9 +83,9 @@ export default function SplashScreen() {
         }
       }
 
-      if (elapsed >= EXIT_START) setExiting(true);
-      if (elapsed >= EXIT_START + EXIT_DURATION) {
-        setVisible(false);
+      if (elapsed >= EXIT_START && (fontsReady || elapsed >= EXIT_START + FONT_READY_GRACE)) {
+        exitStarted.current = true;
+        setExiting(true);
         return;
       }
       frame.current = window.requestAnimationFrame(animate);
@@ -94,35 +97,44 @@ export default function SplashScreen() {
       if (exitTimer.current !== null) window.clearTimeout(exitTimer.current);
       window.clearTimeout(pointerSkipTimer);
       window.removeEventListener('keydown', onKeyDown);
-      document.documentElement.classList.remove('splash-active');
     };
   }, [visible]);
+
+  useEffect(() => {
+    if (!exiting) return undefined;
+    exitTimer.current = window.setTimeout(() => setVisible(false), EXIT_SAFETY_DURATION);
+    return () => window.clearTimeout(exitTimer.current);
+  }, [exiting]);
 
   if (!visible) return null;
 
   const handlePointerSkip = () => {
-    if (!canPointerSkip.current || exitTimer.current !== null) return;
-    setTypedLogo('KDM.');
+    if (!canPointerSkip.current || exitStarted.current) return;
+    exitStarted.current = true;
     setProgress(100);
     setExiting(true);
-    exitTimer.current = window.setTimeout(() => setVisible(false), EXIT_DURATION);
+  };
+
+  const handleRevealEnd = (event) => {
+    if (event.target === event.currentTarget && event.animationName === 'kdm-splash-curve') setVisible(false);
   };
 
   return (
     <div
-      className={`kdm-splash${exiting ? ' is-exiting' : ''}`}
+      className={`kdm-splash-stage${exiting ? ' is-exiting' : ''}`}
       aria-hidden="true"
       onPointerUp={handlePointerSkip}
     >
-      <div className="kdm-splash-content">
-        <div className="kdm-splash-logo" aria-hidden="true">
-          <span>{typedLogo}</span><i className={typedLogo === 'KDM.' ? 'is-finished' : ''} />
-        </div>
-        <p className={`kdm-splash-edition${typedLogo.length >= 3 ? ' is-visible' : ''}`}>Portfolio / 2026</p>
-        <div className="kdm-splash-progress">
-          <strong>{String(progress).padStart(3, '0')}</strong>
-          <div className="kdm-splash-track"><i style={{ transform: `scaleX(${progress / 100})` }} /></div>
-          <p className={progress >= 74 ? 'is-visible' : ''}><span aria-hidden="true">&darr;</span> Entering portfolio</p>
+      <div className="kdm-splash-edge" />
+      <div className="kdm-splash" onAnimationEnd={handleRevealEnd}>
+        <div className="kdm-splash-content">
+          <SplashLogo />
+          <p className="kdm-splash-edition">Portfolio / 2026</p>
+          <div className="kdm-splash-progress">
+            <strong>{String(progress).padStart(3, '0')}</strong>
+            <div className="kdm-splash-track"><i style={{ transform: `scaleX(${progress / 100})` }} /></div>
+            <p className={progress >= 74 ? 'is-visible' : ''}><span aria-hidden="true">&darr;</span> Entering portfolio</p>
+          </div>
         </div>
       </div>
     </div>
