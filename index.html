@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#080808" />
+    <meta name="theme-color" content="#f7f2ea" />
     <meta name="author" content="Kris Dane Madlambayan" />
     <meta name="description" content="Kris Dane Madlambayan's web developer portfolio, featuring responsive websites, front-end projects, technical skills, experience, and contact information." />
     <meta name="keywords" content="Kris Dane Madlambayan, Kris Dane, Kris Madlambayan, Kris Dane Portfolio, Kris Portfolio, Kris Dane Web Developer, Kris Dane Developer, Kris Dane Madlambayan Portfolio, Kris Dane Madlambayan Web Developer, Kris Dane Madlambayan IT Portfolio, Kris Dane Projects, Kris Dane Resume, Kris Dane GitHub, Kris Dane LinkedIn, KDM, KDM Portfolio, KDM Developer, krisdanemadlambayan, krisdanemadlambayan.vercel.app, web developer portfolio, front-end developer, frontend developer, responsive web developer, UI developer, IT student portfolio, student developer portfolio, JavaScript developer, React developer, Node.js developer, MongoDB developer, web developer Philippines, Pampanga web developer, Holy Angel University student developer, SOCConsult, AC-CORE, Thryve, SmartCalc, Recowebdation, AtTheBlanc, Q-Zone" />
@@ -56,8 +56,8 @@
       }
     </script>
     <style>
-      html,body,#root{min-height:100%;background:#080808}
-      html[data-theme="light"],html[data-theme="light"] body,html[data-theme="light"] #root{background:#f7f2ea}
+      html,body,#root{min-height:100%;background:#f7f2ea}
+      html[data-theme="dark"],html[data-theme="dark"] body,html[data-theme="dark"] #root{background:#080808}
       .skip-link{position:fixed;top:0;left:12px;z-index:10000;transform:translateY(-200%)}
       .skip-link:focus,.skip-link:focus-visible{transform:translateY(12px)}
     </style>
@@ -66,9 +66,7 @@
         const key = 'portfolio-theme';
         let saved = null;
         try { saved = localStorage.getItem(key); } catch { /* Storage may be unavailable. */ }
-        const theme = saved === 'light' || saved === 'dark'
-          ? saved
-          : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        const theme = saved === 'light' || saved === 'dark' ? saved : 'light';
         document.documentElement.dataset.theme = theme;
         document.documentElement.style.colorScheme = theme;
         document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f7f2ea' : '#080808';

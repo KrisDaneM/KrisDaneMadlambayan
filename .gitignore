@@ -5,3 +5,9 @@ dist/
 .env
 .env.local
 .env.*.local
+.tmp/qa/
+playwright-report/
+test-results/
+.chrome-cdp/
+.chrome-qa-*/
+.edge-qa-*/

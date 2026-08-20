@@ -29,7 +29,7 @@ export default function LiveMetrics() {
     <section className="live-metrics-section" aria-labelledby="live-metrics-title">
       <div className="container">
         <header className="live-metrics-header">
-          <h2 id="live-metrics-title">KDM / Live metrics</h2>
+          <h2 id="live-metrics-title">KDM / Live metrics <svg className="live-metric-wave" viewBox="0 0 76 18" aria-hidden="true"><path d="M1 10h11l5-7 8 13 8-9 7 6 8-12 8 12 7-5h11" /></svg></h2>
           <p><span aria-hidden="true" />Live activity</p>
         </header>
         <div

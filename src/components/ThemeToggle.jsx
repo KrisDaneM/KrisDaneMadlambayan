@@ -12,13 +12,6 @@ export default function ThemeToggle() {
   const [theme, setTheme] = useState(getCurrentTheme);
   const isTransitioning = useRef(false);
   const buttonRef = useRef(null);
-  const followsSystem = useRef(null);
-
-  if (followsSystem.current === null) {
-    let saved = null;
-    try { saved = window.localStorage.getItem(STORAGE_KEY); } catch { /* Storage may be unavailable. */ }
-    followsSystem.current = saved !== 'light' && saved !== 'dark';
-  }
 
   function applyThemeTokens(next) {
     const root = document.documentElement;
@@ -31,25 +24,11 @@ export default function ThemeToggle() {
   }
 
   function persistTheme(next) {
-    followsSystem.current = false;
     try { window.localStorage.setItem(STORAGE_KEY, next); } catch { /* The selected theme still works for this session. */ }
   }
 
   useEffect(() => {
-    const media = window.matchMedia('(prefers-color-scheme: light)');
-    const followSystem = (event) => {
-      if (followsSystem.current) {
-        const next = event.matches ? 'light' : 'dark';
-        applyThemeTokens(next);
-        updateBrowserTheme(next);
-        setTheme(next);
-      }
-    };
-    media.addEventListener('change', followSystem);
-    return () => {
-      media.removeEventListener('change', followSystem);
-      document.documentElement.classList.remove('theme-transitioning');
-    };
+    return () => document.documentElement.classList.remove('theme-transitioning');
   }, []);
 
   async function toggleTheme() {

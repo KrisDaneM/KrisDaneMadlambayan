@@ -16,8 +16,17 @@ const SUGGESTED_QUESTIONS = [
   'Tell me about SOCConsult',
   'Tell me about AC-CORE',
   'What technologies does Kris use?',
-  'What does Kris do outside coding?',
   'How can I contact Kris?',
+];
+
+const PERSONAL_QUESTIONS = [
+  'What does Kris do outside coding?',
+  "Who is Kris's GOAT?",
+  "What's Kris's favorite dish?",
+  'Does Kris watch anime?',
+  'Does Kris like Marvel?',
+  "Who is Kris's celebrity crush?",
+  "Who is Kris's celebrity lookalike?",
 ];
 
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -38,6 +47,7 @@ export default function PortfolioAssistant() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [hintVisible, setHintVisible] = useState(false);
+  const [showPersonal, setShowPersonal] = useState(false);
   const triggerRef = useRef(null);
   const inputRef = useRef(null);
   const conversationRef = useRef(null);
@@ -78,6 +88,12 @@ export default function PortfolioAssistant() {
     if (reducedMotion()) finishClose();
     else closeTimerRef.current = window.setTimeout(finishClose, 210);
   }, [finishClose]);
+
+  useEffect(() => {
+    const handleOpenRequest = () => openAssistant();
+    window.addEventListener('kdm:open-assistant', handleOpenRequest);
+    return () => window.removeEventListener('kdm:open-assistant', handleOpenRequest);
+  }, [openAssistant]);
 
   const sendMessage = useCallback(async (rawMessage) => {
     const message = rawMessage.trim();
@@ -247,11 +263,14 @@ export default function PortfolioAssistant() {
 
             {messages.length === 1 && (
               <div className="assistant-suggestions" aria-label="Suggested questions">
+                <p>01 / Professional</p>
                 {SUGGESTED_QUESTIONS.map((question) => (
                   <button type="button" key={question} onClick={() => sendMessage(question)} disabled={loading}>
                     {question}
                   </button>
                 ))}
+                <button type="button" className="assistant-suggestions-more" aria-expanded={showPersonal} onClick={() => setShowPersonal((current) => !current)}>{showPersonal ? 'Show less' : 'Show more / Personal'}</button>
+                {showPersonal && <div className="assistant-personal-suggestions"><p>04 / Personal</p>{PERSONAL_QUESTIONS.map((question) => <button type="button" key={question} onClick={() => sendMessage(question)} disabled={loading}>{question}</button>)}</div>}
               </div>
             )}
 

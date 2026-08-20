@@ -32,6 +32,10 @@ export default function CommandPalette() {
       path: `/projects/${project.slug}`,
       group: 'Projects',
     })),
+    { id: 'toggle-theme', label: 'Toggle theme', group: 'Actions', action: () => document.querySelector('.universe-switch')?.click() },
+    { id: 'assistant', label: 'Open KDM Assistant', group: 'Actions', action: () => window.dispatchEvent(new CustomEvent('kdm:open-assistant')) },
+    { id: 'download-cv', label: 'Download CV', group: 'Actions', action: () => { const link = document.createElement('a'); link.href = '/downloads/resume.pdf'; link.download = 'Kris-Dane-Madlambayan-Resume.pdf'; link.click(); } },
+    { id: 'contact-kris', label: 'Contact Kris', path: '/contact', group: 'Actions' },
   ], []);
 
   const filteredCommands = useMemo(() => {
@@ -68,7 +72,8 @@ export default function CommandPalette() {
 
   const runCommand = useCallback((command) => {
     if (!command) return;
-    navigate(command.path);
+    if (command.action) command.action();
+    else navigate(command.path);
     closePalette();
   }, [closePalette, navigate]);
 
@@ -155,7 +160,7 @@ export default function CommandPalette() {
               <kbd>ESC</kbd>
             </div>
             <div id="command-palette-results" className="command-palette-results" role="listbox">
-              {['Navigation', 'Projects'].map((group) => {
+              {['Navigation', 'Projects', 'Actions'].map((group) => {
                 const groupCommands = filteredCommands.filter((command) => command.group === group);
                 if (!groupCommands.length) return null;
                 return (

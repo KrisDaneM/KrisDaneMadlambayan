@@ -13,8 +13,16 @@ export const portfolioProfile = {
   location: 'San Fernando City, Pampanga, Philippines',
   email: 'krisdane1234@gmail.com',
   gender: 'Male',
-  interests: ['Basketball'],
+  interests: [
+    'Hanging out with friends and family',
+    'Playing basketball',
+    'Playing games',
+    'Watching movies',
+  ],
   celebrityCrush: 'Kathryn Bernardo',
+  celebrityLookalike: 'Daniel Padilla',
+  goat: 'Naruto Uzumaki',
+  favoriteDish: 'Kare-kare',
 };
 
 export const skills = [

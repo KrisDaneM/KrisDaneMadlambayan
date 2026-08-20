@@ -18,6 +18,7 @@ export default function ProjectRow({ project, compact = false, number }) {
       <Link to={`/projects/${project.slug}`}>Case study <ArrowRight aria-hidden="true" /></Link>
       {!compact && <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">Live site <ArrowUpRight aria-hidden="true" /></a>}
     </div>
+    <span className="project-signal" aria-hidden="true">KDM / ACTIVE PROJECT · {number || project.id}</span>
     <span className="work-row-accent" aria-hidden="true" />
   </article>;
 }
