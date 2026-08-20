@@ -137,7 +137,6 @@ export default function Projects() {
 
       <section className="projects-index-hero">
         <div className="projects-index-grid-bg" aria-hidden="true" />
-        <div className="projects-index-signal"><span />KDM / PROJECT SIGNAL <i>NOW INSPECTING → <b>PROJECT INDEX</b></i></div>
         <div className="container projects-index-hero-layout">
           <div className="projects-index-hero-left">
             <motion.div className="projects-index-guide" aria-hidden="true" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: .35, delay: .08 }}>

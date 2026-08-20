@@ -173,7 +173,7 @@ function FrontendSystem({ reduce }) {
       <path className="about-fe-signal" d="M565 60H720V138" />
       <path className="about-fe-signal" d="M130 440H264V414" />
       <path className="about-fe-signal" d="M784 278H846V222" />
-      <path className="about-fe-signal" d="M765 500H862V454" />
+      <path className="about-fe-signal" d="M765 405H862V378" />
     </svg>
 
     <motion.div className="about-fe-label about-fe-label--user" {...enter(.62, 0, -8)}><UserRound /><span><i />USER FOCUSED</span></motion.div>
@@ -338,7 +338,7 @@ export default function About() {
             <div className="about-toolkit-top">
               <motion.header className="about-toolkit-intro" {...reveal()}>
                 <motion.i className="about-toolkit-guide" aria-hidden="true" initial={reduce ? false : { opacity: 0, scaleY: 0 }} whileInView={{ opacity: 1, scaleY: 1 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .55, delay: .12, ease }}><b /><span /></motion.i>
-                <p className="about-toolkit-kicker"><i aria-hidden="true" />TOOLKIT</p>
+                <p className="about-toolkit-kicker"><span>01</span>TOOLKIT</p>
                 <h2><span>Tools I use to</span><span>turn ideas into</span><em>responsive</em><em>digital</em><em>experiences.</em></h2>
                 <p>Organized around the work they support, from interface design and front-end implementation to application foundations and delivery.</p>
               </motion.header>
