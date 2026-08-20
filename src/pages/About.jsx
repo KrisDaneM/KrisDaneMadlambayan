@@ -348,14 +348,14 @@ export default function About() {
                   <ul>{group.items.map((technology, itemIndex) => { const Icon = technologyIcons[technology] || Braces; return <motion.li key={technology} initial={reduce ? false : { opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .45, delay: .2 + groupIndex * .1 + itemIndex * .035, ease }}><Icon aria-hidden="true" /><span>{technology}</span><i aria-hidden="true" /></motion.li>; })}</ul>
                 </motion.article>)}
                 <div className="about-toolkit-flow">
-                  <header><span>BUILD FLOW</span><motion.i aria-hidden="true" initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: .58, delay: .42, ease }}><b /></motion.i></header>
-                  <ol>{toolkitBuildFlow.map(([stage, tool, Icon], index) => <motion.li key={stage} initial={reduce ? false : { opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .38, delay: .48 + index * .06, ease }}><span className="about-toolkit-flow-icon"><Icon aria-hidden="true" /></span><i className="about-toolkit-flow-node" aria-hidden="true" /><strong>{stage}</strong><small>{tool}</small>{index < toolkitBuildFlow.length - 1 && <ArrowRight aria-hidden="true" />}</motion.li>)}</ol>
+                  <header><span><b>03</b>BUILD FLOW</span><motion.i aria-hidden="true" initial={reduce ? false : { scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .58, delay: .32, ease }}><b /></motion.i></header>
+                  <ol>{toolkitBuildFlow.map(([stage, tool, Icon], index) => <motion.li key={stage} initial={reduce ? false : { opacity: 0, y: 7 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .38, delay: .38 + index * .06, ease }}><span className="about-toolkit-flow-icon"><Icon aria-hidden="true" /></span><i className="about-toolkit-flow-node" aria-hidden="true" /><strong>{stage}</strong><small>{tool}</small>{index < toolkitBuildFlow.length - 1 && <ArrowRight aria-hidden="true" />}</motion.li>)}</ol>
                 </div>
               </div>
             </div>
             <div className="about-toolkit-secondary">
               {toolkitGroups.slice(2).map((group, groupIndex) => <motion.article className={`about-toolkit-group about-toolkit-group--${group.id}`} key={group.id} {...reveal(.28 + groupIndex * .08)}>
-                <header><span>{String(groupIndex + 3).padStart(2, '0')}</span><h3>{group.title}</h3><i aria-hidden="true"><b /></i></header>
+                <header><span>{String(groupIndex + 4).padStart(2, '0')}</span><h3>{group.title}</h3><i aria-hidden="true"><b /></i></header>
                 <ul>{group.items.map((technology, itemIndex) => { const Icon = technologyIcons[technology] || Braces; return <motion.li key={technology} initial={reduce ? false : { opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .45, delay: .38 + groupIndex * .08 + itemIndex * .035, ease }}><Icon aria-hidden="true" /><span>{technology}</span><i aria-hidden="true" /></motion.li>; })}</ul>
               </motion.article>)}
             </div>

@@ -137,18 +137,20 @@ export default function Projects() {
 
       <section className="projects-index-hero">
         <div className="projects-index-grid-bg" aria-hidden="true" />
-        <motion.div className="projects-index-guide" aria-hidden="true" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: .35, delay: .08 }}>
-          <span>01</span><motion.i initial={reduceMotion ? false : { scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: .55, delay: .18, ease }}><b /><b /><b /></motion.i><strong>PROJECT INDEX</strong>
-        </motion.div>
         <div className="projects-index-signal"><span />KDM / PROJECT SIGNAL <i>NOW INSPECTING → <b>PROJECT INDEX</b></i></div>
         <div className="container projects-index-hero-layout">
-          <motion.header className="projects-index-hero-copy" initial={reduceMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .48, delay: .08, ease }}>
-            <p><i />PROJECT INDEX</p>
-            <h1 aria-label="Work that moves between systems and stories.">
-              <span>Work that</span><span>moves between</span><span><em>systems</em> and</span><span>stories.</span>
-            </h1>
-            <a href="#projects-index"><i />EXPLORE THE WORK <ArrowRight /></a>
-          </motion.header>
+          <div className="projects-index-hero-left">
+            <motion.div className="projects-index-guide" aria-hidden="true" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: .35, delay: .08 }}>
+              <span>01</span><motion.i initial={reduceMotion ? false : { scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: .55, delay: .18, ease }}><b /><b /><b /></motion.i><strong>PROJECT INDEX</strong>
+            </motion.div>
+            <motion.header className="projects-index-hero-copy" initial={reduceMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .48, delay: .08, ease }}>
+              <p><i />PROJECT INDEX</p>
+              <h1 aria-label="Work that moves between systems and stories.">
+                <span>Work that</span><span>moves between</span><span><em>systems</em> and</span><span>stories.</span>
+              </h1>
+              <a href="#projects-index"><i />EXPLORE THE WORK <ArrowRight /></a>
+            </motion.header>
+          </div>
 
           <ProjectSystemGraphic reduceMotion={reduceMotion} />
 
