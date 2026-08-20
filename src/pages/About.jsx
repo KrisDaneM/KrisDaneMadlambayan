@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -7,11 +7,11 @@ import {
   Code2,
   Database,
   GraduationCap,
-  Layers3,
   MonitorSmartphone,
   PanelsTopLeft,
   Search,
   Send,
+  Share2,
   Sparkles,
   Target,
   UserRound,
@@ -147,62 +147,28 @@ const capabilityMap = [
   ...capability,
   projects: capability.projects.map((slug) => projectBySlug.get(slug)).filter(Boolean),
 }));
+const capabilityIcons = [MonitorSmartphone, UserRound, Code2, Database, Share2];
 
 function SectionLabel({ index, children }) {
   return <p className="about-v3-label"><span>{index}</span>{children}</p>;
 }
 
-function CapabilityConnectors({ reduce }) {
-  const svgRef = useRef(null);
-  const [geometry, setGeometry] = useState({ width: 1000, height: 790, paths: [] });
-
-  useEffect(() => {
-    const svg = svgRef.current;
-    const network = svg?.closest('.about-cap-network');
-    if (!svg || !network) return undefined;
-
-    let frame;
-    const update = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const bounds = network.getBoundingClientRect();
-        const starts = [...network.querySelectorAll('.about-cap-hub-node')];
-        const ends = [...network.querySelectorAll('.about-cap-index > i b')];
-        if (!bounds.width || !bounds.height || starts.length !== ends.length) return;
-
-        const center = (element) => {
-          const rect = element.getBoundingClientRect();
-          return { x: rect.left + rect.width / 2 - bounds.left, y: rect.top + rect.height / 2 - bounds.top };
-        };
-        const paths = starts.map((start, index) => {
-          const from = center(start);
-          const to = center(ends[index]);
-          const firstTurn = Math.min(from.x + 42, to.x - 72);
-          const secondTurn = Math.max(firstTurn + 26, to.x - 48);
-          return `M${from.x} ${from.y} H${firstTurn} L${secondTurn} ${to.y} H${to.x}`;
-        });
-        setGeometry({ width: bounds.width, height: bounds.height, paths });
-      });
-    };
-
-    update();
-    document.fonts?.ready.then(update);
-    const observer = new ResizeObserver(update);
-    observer.observe(network);
-    window.addEventListener('resize', update);
-    return () => {
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-      window.removeEventListener('resize', update);
-    };
-  }, []);
-
-  return <svg ref={svgRef} className="about-cap-connectors" viewBox={`0 0 ${geometry.width} ${geometry.height}`} preserveAspectRatio="none" aria-hidden="true">
-    {geometry.paths.map((path, index) => <g key={index} className={`about-cap-connector about-cap-connector--${index + 1}`}>
-      <motion.path d={path} initial={reduce ? false : { pathLength: 0, opacity: 0 }} whileInView={{ pathLength: 1, opacity: 1 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .48, delay: .28 + index * .09, ease }} />
-      <path className="about-cap-connector-signal" d={path} />
-    </g>)}
-  </svg>;
+function CapabilityArchitecture({ reduce }) {
+  return <motion.div className="about-cap-architecture" initial={reduce ? false : { opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .58, delay: .2, ease }} aria-hidden="true">
+    <svg viewBox="0 0 380 470" focusable="false">
+      <g className="about-cap-architecture-guides">
+        <path d="M190 24V438M42 210H338M76 92L304 342M304 92L76 342" />
+        <ellipse cx="190" cy="382" rx="136" ry="58" /><ellipse cx="190" cy="382" rx="104" ry="42" /><ellipse cx="190" cy="382" rx="73" ry="28" />
+      </g>
+      <g className="about-cap-architecture-stack">
+        {[0, 1, 2, 3, 4].map((layer) => <g key={layer} style={{ '--layer': layer }}>
+          <polygon points={`190,${116 + layer * 49} 286,${168 + layer * 49} 190,${220 + layer * 49} 94,${168 + layer * 49}`} />
+          <path d={`M94 ${168 + layer * 49}V${180 + layer * 49}L190 ${232 + layer * 49}L286 ${180 + layer * 49}V${168 + layer * 49}`} />
+        </g>)}
+      </g>
+      <g className="about-cap-architecture-nodes"><circle cx="42" cy="210" r="3" /><circle cx="338" cy="210" r="3" /><circle cx="190" cy="24" r="3" /><circle cx="190" cy="438" r="3" /><circle cx="77" cy="93" r="2" /><circle cx="303" cy="93" r="2" /></g>
+    </svg>
+  </motion.div>;
 }
 
 function InterfacePreview({ size, type }) {
@@ -419,36 +385,33 @@ export default function About() {
           <div className="about-cap-map-grid" aria-hidden="true" />
           <div className="container about-cap-layout">
             <motion.header className="about-cap-intro" {...reveal()}>
-              <p className="about-cap-kicker"><span>03</span><i>/</i> CAPABILITIES</p>
+              <p className="about-cap-kicker"><span>02</span><i>//</i> CAPABILITIES</p>
               <h2><span>Capabilities</span><span>shaped by</span><em>real projects</em><em>and practical</em><em>work.</em></h2>
-              <p className="about-cap-summary">I combine clean implementation, thoughtful interaction, and attention to detail to build digital experiences that are useful and easy to understand.</p>
+              <p className="about-cap-summary">I combine clean implementation, thoughtful interaction, and attention to detail to build digital experiences that are useful, usable, and built to last.</p>
+              <CapabilityArchitecture reduce={reduce} />
               <a className="about-cap-approach" href="#philosophy"><i aria-hidden="true" />MY APPROACH <ArrowRight aria-hidden="true" /></a>
               <span className="about-cap-intro-guide" aria-hidden="true"><i /></span>
             </motion.header>
 
             <div className="about-cap-network">
-              <motion.div className="about-cap-hub" initial={reduce ? false : { opacity: 0, scale: .94 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .52, delay: .12, ease }} aria-hidden="true">
-                <i /><i /><i /><i />
-                <span><Layers3 /></span>
-                <b className="about-cap-hub-node about-cap-hub-node--1" /><b className="about-cap-hub-node about-cap-hub-node--2" /><b className="about-cap-hub-node about-cap-hub-node--3" /><b className="about-cap-hub-node about-cap-hub-node--4" /><b className="about-cap-hub-node about-cap-hub-node--5" />
-              </motion.div>
-
-              <CapabilityConnectors reduce={reduce} />
-
               <div className="about-cap-list">
-                {capabilityMap.map((capability, index) => <motion.article className={`about-cap-item about-cap-item--${index + 1}${capability.primary ? ' is-primary' : ''}`} key={capability.title} {...reveal(.34 + index * .07)}>
-                  <div className="about-cap-index"><strong>{String(index + 1).padStart(2, '0')}</strong><i><b /></i></div>
-                  <div className="about-cap-copy">
-                    {capability.status && <small>{capability.status}</small>}
-                    <h3>{capability.title}</h3>
-                    <p>{capability.description}</p>
-                    <ul aria-label={`${capability.title} technologies`}>{capability.technologies.map((technology) => <li key={technology}>{technology}</li>)}</ul>
-                  </div>
-                  <div className="about-cap-work">
-                    <small>RELATED WORK</small>
-                    {capability.projects.map((project) => <Link key={project.slug} to={`/projects/${project.slug}`}>{project.title}<ArrowRight aria-hidden="true" /></Link>)}
-                  </div>
-                </motion.article>)}
+                <motion.i className="about-cap-timeline" aria-hidden="true" initial={reduce ? false : { scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={{ once: true, amount: .05 }} transition={{ duration: .82, delay: .08, ease }} />
+                {capabilityMap.map((capability, index) => {
+                  const CapabilityIcon = capabilityIcons[index];
+                  return <motion.article className={`about-cap-item about-cap-item--${index + 1}${capability.primary ? ' is-primary' : ''}`} key={capability.title} {...reveal(.2 + index * .08)}>
+                    <div className="about-cap-index"><strong>{String(index + 1).padStart(2, '0')}</strong><span><CapabilityIcon aria-hidden="true" /></span></div>
+                    <div className="about-cap-copy">
+                      {capability.status && <small>{capability.status}</small>}
+                      <h3>{capability.title}</h3>
+                      <p>{capability.description}</p>
+                      <ul aria-label={`${capability.title} technologies`}>{capability.technologies.map((technology) => <li key={technology}>{technology}</li>)}</ul>
+                    </div>
+                    <div className="about-cap-work">
+                      <small>RELATED WORK</small>
+                      {capability.projects.map((project) => <Link key={project.slug} to={`/projects/${project.slug}`}>{project.title}<ArrowRight aria-hidden="true" /></Link>)}
+                    </div>
+                  </motion.article>;
+                })}
               </div>
             </div>
           </div>
