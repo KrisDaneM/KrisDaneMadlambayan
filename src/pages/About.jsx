@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -150,6 +150,59 @@ const capabilityMap = [
 
 function SectionLabel({ index, children }) {
   return <p className="about-v3-label"><span>{index}</span>{children}</p>;
+}
+
+function CapabilityConnectors({ reduce }) {
+  const svgRef = useRef(null);
+  const [geometry, setGeometry] = useState({ width: 1000, height: 790, paths: [] });
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    const network = svg?.closest('.about-cap-network');
+    if (!svg || !network) return undefined;
+
+    let frame;
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const bounds = network.getBoundingClientRect();
+        const starts = [...network.querySelectorAll('.about-cap-hub-node')];
+        const ends = [...network.querySelectorAll('.about-cap-index > i b')];
+        if (!bounds.width || !bounds.height || starts.length !== ends.length) return;
+
+        const center = (element) => {
+          const rect = element.getBoundingClientRect();
+          return { x: rect.left + rect.width / 2 - bounds.left, y: rect.top + rect.height / 2 - bounds.top };
+        };
+        const paths = starts.map((start, index) => {
+          const from = center(start);
+          const to = center(ends[index]);
+          const firstTurn = Math.min(from.x + 42, to.x - 72);
+          const secondTurn = Math.max(firstTurn + 26, to.x - 48);
+          return `M${from.x} ${from.y} H${firstTurn} L${secondTurn} ${to.y} H${to.x}`;
+        });
+        setGeometry({ width: bounds.width, height: bounds.height, paths });
+      });
+    };
+
+    update();
+    document.fonts?.ready.then(update);
+    const observer = new ResizeObserver(update);
+    observer.observe(network);
+    window.addEventListener('resize', update);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
+  return <svg ref={svgRef} className="about-cap-connectors" viewBox={`0 0 ${geometry.width} ${geometry.height}`} preserveAspectRatio="none" aria-hidden="true">
+    {geometry.paths.map((path, index) => <g key={index} className={`about-cap-connector about-cap-connector--${index + 1}`}>
+      <motion.path d={path} initial={reduce ? false : { pathLength: 0, opacity: 0 }} whileInView={{ pathLength: 1, opacity: 1 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .48, delay: .28 + index * .09, ease }} />
+      <path className="about-cap-connector-signal" d={path} />
+    </g>)}
+  </svg>;
 }
 
 function InterfacePreview({ size, type }) {
@@ -380,18 +433,7 @@ export default function About() {
                 <b className="about-cap-hub-node about-cap-hub-node--1" /><b className="about-cap-hub-node about-cap-hub-node--2" /><b className="about-cap-hub-node about-cap-hub-node--3" /><b className="about-cap-hub-node about-cap-hub-node--4" /><b className="about-cap-hub-node about-cap-hub-node--5" />
               </motion.div>
 
-              <svg className="about-cap-connectors" viewBox="0 0 1000 790" preserveAspectRatio="none" aria-hidden="true">
-                {[
-                  'M238 332 L308 128 Q315 108 337 108 H430',
-                  'M270 360 L355 255 Q365 243 382 243 H485',
-                  'M305 398 H520',
-                  'M275 455 L355 535 Q365 545 385 545 H490',
-                  'M238 480 L314 690 Q321 708 345 708 H430',
-                ].map((path, index) => <g key={path} className={`about-cap-connector about-cap-connector--${index + 1}`}>
-                  <motion.path d={path} initial={reduce ? false : { pathLength: 0, opacity: 0 }} whileInView={{ pathLength: 1, opacity: 1 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .48, delay: .28 + index * .09, ease }} />
-                  <path className="about-cap-connector-signal" d={path} />
-                </g>)}
-              </svg>
+              <CapabilityConnectors reduce={reduce} />
 
               <div className="about-cap-list">
                 {capabilityMap.map((capability, index) => <motion.article className={`about-cap-item about-cap-item--${index + 1}${capability.primary ? ' is-primary' : ''}`} key={capability.title} {...reveal(.34 + index * .07)}>
