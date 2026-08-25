@@ -61,7 +61,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className={`orbit-navigation ${open ? 'is-menu-open' : ''}`}>
+    <header className={`orbit-navigation${pathname === '/' ? ' is-home-route' : ''}${open ? ' is-menu-open' : ''}`}>
       <NavLink to="/" className="kdm-signature" aria-label="KDM home">KDM<span>.</span></NavLink>
       <nav className={`route-orbit ${open ? 'is-open' : ''}`} aria-label="Primary navigation">
         <div className="orbit-ring" aria-hidden="true"><span /><span /><span /></div>

@@ -20,7 +20,7 @@ const SplashLogo = memo(function SplashLogo() {
   return <div className="kdm-signal-logo" aria-hidden="true"><span>K</span><span>D</span><span>M</span><b>.</b><i /></div>;
 });
 
-function SignalGeometry() {
+const SignalGeometry = memo(function SignalGeometry() {
   return <div className="kdm-signal-geometry kdm-vortex-part--geometry" aria-hidden="true">
     <div className="kdm-signal-crosshair"><i /><i /></div>
     <svg viewBox="0 0 600 600" focusable="false">
@@ -34,9 +34,9 @@ function SignalGeometry() {
       <path className="kdm-signal-sweep" d="M60 291a240 151 0 0 1 459-41" />
     </svg>
   </div>;
-}
+});
 
-function VortexSystem() {
+const VortexSystem = memo(function VortexSystem() {
   return <div className="kdm-vortex-system" aria-hidden="true">
     <div className="kdm-vortex-field" />
     <svg className="kdm-vortex-trails" viewBox="0 0 600 600" focusable="false">
@@ -55,9 +55,9 @@ function VortexSystem() {
     </svg>
     <div className="kdm-vortex-horizon"><i /></div>
   </div>;
-}
+});
 
-function ApertureCurtain() {
+const ApertureCurtain = memo(function ApertureCurtain() {
   return <svg className="kdm-vortex-curtain" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
     <defs>
       <mask id="kdm-vortex-mask">
@@ -67,7 +67,7 @@ function ApertureCurtain() {
     </defs>
     <rect width="100" height="100" fill="#080808" mask="url(#kdm-vortex-mask)" />
   </svg>;
-}
+});
 
 const energyStreaks = [
   [-7, '43vmin', 0, 'orange'], [18, '35vmin', 32, 'white'], [43, '40vmin', 12, 'orange'],
@@ -82,7 +82,7 @@ const energyParticles = [
 ];
 const orbitFragments = [[-18, '21vmin', 0], [42, '26vmin', 40], [106, '23vmin', 18], [174, '27vmin', 55], [238, '22vmin', 28], [306, '25vmin', 8]];
 
-function HomeIgnition() {
+const HomeIgnition = memo(function HomeIgnition() {
   return <div className="kdm-home-ignition" aria-hidden="true">
     <div className="kdm-energy-core"><i /><b /><em /><span />{[0, 45, 90, 135].map((angle) => <u key={angle} style={{ '--ray-angle': `${angle}deg` }} />)}</div>
     <div className="kdm-energy-waves"><i /><i /><i /></div>
@@ -91,7 +91,7 @@ function HomeIgnition() {
     <div className="kdm-energy-fragments">{orbitFragments.map(([angle, distance, delay], index) => <i key={angle} className={`kdm-energy-fragment--${index + 1}`} style={{ '--angle': `${angle}deg`, '--distance': distance, '--delay': `${delay}ms` }} />)}</div>
     <div className="kdm-energy-ripples"><i /><i /></div>
   </div>;
-}
+});
 
 export default function SplashScreen() {
   const [visible, setVisible] = useState(showOnThisPageLoad);
