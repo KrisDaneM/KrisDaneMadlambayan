@@ -3,8 +3,9 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { Buffer } from 'node:buffer';
 import process from 'node:process';
-import visitorsHandler from './api/visitors.js';
 import aiHandler from './api/ai.js';
+
+let visitorsHandler;
 
 async function readRequestBody(request) {
   const chunks = [];
@@ -30,6 +31,7 @@ function localVisitorsApi() {
     name: 'kdm-local-visitors-api',
     configureServer(server) {
       server.middlewares.use('/api/visitors', async (request, response) => {
+        visitorsHandler ||= (await import('./api/visitors.js')).default;
         if (request.method === 'POST') {
           request.body = await readRequestBody(request);
         }
@@ -54,9 +56,12 @@ function localAiApi() {
 }
 
 export default defineConfig(({ mode }) => {
-  const serverEnvironment = loadEnv(mode, process.cwd(), ['MONGODB_URI', 'GROQ_']);
-  if (!process.env.MONGODB_URI && serverEnvironment.MONGODB_URI) {
-    process.env.MONGODB_URI = serverEnvironment.MONGODB_URI;
+  const serverEnvironment = loadEnv(mode, process.cwd(), ['UPSTASH_', 'GROQ_']);
+  if (!process.env.UPSTASH_REDIS_REST_URL && serverEnvironment.UPSTASH_REDIS_REST_URL) {
+    process.env.UPSTASH_REDIS_REST_URL = serverEnvironment.UPSTASH_REDIS_REST_URL;
+  }
+  if (!process.env.UPSTASH_REDIS_REST_TOKEN && serverEnvironment.UPSTASH_REDIS_REST_TOKEN) {
+    process.env.UPSTASH_REDIS_REST_TOKEN = serverEnvironment.UPSTASH_REDIS_REST_TOKEN;
   }
   if (!process.env.GROQ_API_KEY && serverEnvironment.GROQ_API_KEY) {
     process.env.GROQ_API_KEY = serverEnvironment.GROQ_API_KEY;

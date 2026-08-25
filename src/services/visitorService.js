@@ -75,3 +75,16 @@ export function trackProjectView(slug) {
   }
   return projectViewPromises.get(slug);
 }
+
+export function trackResumeDownload() {
+  return fetch('/api/visitors', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event: 'resume-download' }),
+  })
+    .then((response) => parseMetricsResponse(response, 'Resume download tracking failed.'))
+    .then((metrics) => {
+      metricsPromise = Promise.resolve(metrics);
+      return metrics;
+    });
+}

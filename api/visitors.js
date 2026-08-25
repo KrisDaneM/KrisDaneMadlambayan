@@ -1,7 +1,13 @@
 import { createHash } from 'node:crypto';
-import { getDatabase } from './_lib/mongodb.js';
+import { redis } from './_lib/redis.js';
 
-const METRICS_ID = 'portfolio';
+const KEYS = {
+  totalViews: 'kdm:analytics:totalViews',
+  uniqueVisitors: 'kdm:analytics:uniqueVisitors',
+  projectViews: 'kdm:analytics:projectViews',
+  resumeDownloads: 'kdm:analytics:resumeDownloads',
+  visitorIds: 'kdm:analytics:visitorIds',
+};
 
 function publicMetrics(document = {}) {
   return {
@@ -23,61 +29,42 @@ function parseVisitorId(body) {
   return visitorId;
 }
 
-function parseProjectView(body) {
+function parseEvent(body) {
   let payload = body;
   if (typeof body === 'string') {
     try { payload = JSON.parse(body); } catch { return null; }
   }
+  if (payload?.event === 'resume-download') return { type: 'resume-download' };
   if (payload?.event !== 'project-view' || typeof payload.slug !== 'string') return null;
   const slug = payload.slug.trim();
-  return /^[a-z0-9-]{2,80}$/.test(slug) ? slug : null;
+  return /^[a-z0-9-]{2,80}$/.test(slug) ? { type: 'project-view' } : null;
 }
 
-async function registerProjectView(database) {
-  const metrics = await database.collection('metrics').findOneAndUpdate(
-    { _id: METRICS_ID },
-    {
-      $inc: { projectViews: 1 },
-      $set: { updatedAt: new Date() },
-      $setOnInsert: { totalViews: 0, uniqueVisitors: 0, resumeDownloads: 0 },
-    },
-    { upsert: true, returnDocument: 'after' },
+async function getMetrics() {
+  const [totalViews, uniqueVisitors, projectViews, resumeDownloads] = await redis.mget(
+    KEYS.totalViews,
+    KEYS.uniqueVisitors,
+    KEYS.projectViews,
+    KEYS.resumeDownloads,
   );
-  return publicMetrics(metrics);
+  return publicMetrics({ totalViews, uniqueVisitors, projectViews, resumeDownloads });
 }
 
-async function registerVisitor(database, visitorId) {
-  const visitors = database.collection('visitors');
-  const metrics = database.collection('metrics');
+async function registerEvent(key) {
+  await redis.incr(key);
+  return getMetrics();
+}
+
+async function registerVisitor(visitorId) {
   const visitorHash = createHash('sha256').update(visitorId).digest('hex');
-  const now = new Date();
-  let visitorResult;
+  const isNewVisitor = (await redis.sadd(KEYS.visitorIds, visitorHash)) === 1;
+  const pipeline = redis.pipeline();
 
-  try {
-    visitorResult = await visitors.updateOne(
-      { _id: visitorHash },
-      { $setOnInsert: { firstSeenAt: now }, $set: { lastSeenAt: now }, $inc: { views: 1 } },
-      { upsert: true },
-    );
-  } catch (error) {
-    if (error?.code !== 11000) throw error;
-    await visitors.updateOne(
-      { _id: visitorHash },
-      { $set: { lastSeenAt: now }, $inc: { views: 1 } },
-    );
-    visitorResult = { upsertedCount: 0 };
-  }
+  pipeline.incr(KEYS.totalViews);
+  if (isNewVisitor) pipeline.incr(KEYS.uniqueVisitors);
 
-  const metricsResult = await metrics.findOneAndUpdate(
-    { _id: METRICS_ID },
-    {
-      $inc: { totalViews: 1, uniqueVisitors: visitorResult.upsertedCount === 1 ? 1 : 0 },
-      $set: { updatedAt: now },
-      $setOnInsert: { projectViews: 0, resumeDownloads: 0 },
-    },
-    { upsert: true, returnDocument: 'after' },
-  );
-  return publicMetrics(metricsResult);
+  await pipeline.exec();
+  return getMetrics();
 }
 
 export default async function handler(request, response) {
@@ -85,21 +72,16 @@ export default async function handler(request, response) {
   response.setHeader('Allow', 'GET, POST');
 
   try {
-    const database = await getDatabase();
     if (request.method === 'GET') {
-      const metrics = await database.collection('metrics').findOne(
-        { _id: METRICS_ID },
-        { projection: { _id: 0, totalViews: 1, uniqueVisitors: 1, projectViews: 1, resumeDownloads: 1 } },
-      );
-      return response.status(200).json(publicMetrics(metrics));
+      return response.status(200).json(await getMetrics());
     }
     if (request.method === 'POST') {
-      if (parseProjectView(request.body)) {
-        return response.status(200).json(await registerProjectView(database));
-      }
+      const event = parseEvent(request.body);
+      if (event?.type === 'project-view') return response.status(200).json(await registerEvent(KEYS.projectViews));
+      if (event?.type === 'resume-download') return response.status(200).json(await registerEvent(KEYS.resumeDownloads));
       const visitorId = parseVisitorId(request.body);
       if (!visitorId) return response.status(400).json({ error: 'A valid visitorId is required.' });
-      return response.status(200).json(await registerVisitor(database, visitorId));
+      return response.status(200).json(await registerVisitor(visitorId));
     }
     return response.status(405).json({ error: 'Method not allowed.' });
   } catch {
