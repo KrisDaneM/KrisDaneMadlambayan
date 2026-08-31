@@ -98,6 +98,7 @@ export const projects = [
     problem: 'AniReco addresses the common problem of not knowing what anime to watch next. Instead of requiring users to manually browse large anime libraries, the platform provides personalized recommendations, mood-based discovery, comparison tools, Anime Roulette, and an AI assistant to make choosing an anime faster and more enjoyable.',
     solution: 'AniReco combines anime exploration, filtering, personalized recommendations, mood-based discovery, comparisons, Anime Roulette, favorites, detailed anime information, and an AI assistant in one platform.',
     stack: [],
+    liveUrl: 'https://anireco-eta.vercel.app/',
     dataSource: 'Live anime information powered by AniList.',
     notice: 'AniReco is not an anime streaming or downloading platform. It is designed specifically for anime discovery, recommendations, and information.',
     searchTerms: ['anime', 'recommendation', 'discovery', 'AniList', 'mood', 'roulette'],
