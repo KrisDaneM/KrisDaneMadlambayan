@@ -7,9 +7,11 @@ function projectLine(project) {
     `category: ${project.category}`,
     project.role ? `Kris's role: ${project.role}` : null,
     `summary: ${project.description}`,
-    `technologies: ${project.stack.join(', ')}`,
+    project.stack.length ? `technologies: ${project.stack.join(', ')}` : null,
     `case study: /projects/${project.slug}`,
-    `live website: ${project.liveUrl}`,
+    project.dataSource ? `data source: ${project.dataSource}` : null,
+    project.notice ? `important notice: ${project.notice}` : null,
+    project.liveUrl ? `live website: ${project.liveUrl}` : null,
     project.sourceUrl ? `source: ${project.sourceUrl}` : null,
   ].filter(Boolean);
 

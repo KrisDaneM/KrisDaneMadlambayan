@@ -44,7 +44,7 @@ function matchesFilter(project, filter) {
 
 function matchesSearch(project, query) {
   if (!query.trim()) return true;
-  const searchable = [project.title, project.type, project.category, project.description, ...(project.stack || [])]
+  const searchable = [project.title, project.type, project.category, project.description, ...(project.stack || []), ...(project.searchTerms || [])]
     .join(' ')
     .toLowerCase();
   return searchable.includes(query.trim().toLowerCase());

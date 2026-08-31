@@ -90,6 +90,32 @@ export const projects = [
     learning: 'Developing SOCConsult provided experience designing a multi-role web application where scheduling, authentication, appointment workflows, records, and administrative tools needed to work together consistently. The project reinforced the importance of clear role permissions, structured API design, reliable data handling, and building interfaces around real academic workflows.',
     seoDescription: 'SOCConsult is a faculty-student consultation and appointment scheduling system developed for the School of Computing of Holy Angel University.',
   },
+  {
+    id: '08', slug: 'anireco', title: 'AniReco', category: 'Anime Discovery & Recommendation Platform', type: 'Personal Project',
+    description: 'A web-based anime discovery and recommendation platform that helps users find anime based on their interests, preferences, and mood while providing up-to-date anime information.',
+    overview: 'AniReco is a web-based anime discovery, recommendation, and information platform designed to help users discover anime that matches their interests, preferences, and mood.',
+    purpose: 'The main purpose of AniReco is to make anime discovery easier, more personalized, and more interactive. With thousands of anime available, users may have difficulty deciding what to watch. AniReco provides several ways to explore and discover anime instead of relying only on manual title searches.',
+    problem: 'AniReco addresses the common problem of not knowing what anime to watch next. Instead of requiring users to manually browse large anime libraries, the platform provides personalized recommendations, mood-based discovery, comparison tools, Anime Roulette, and an AI assistant to make choosing an anime faster and more enjoyable.',
+    solution: 'AniReco combines anime exploration, filtering, personalized recommendations, mood-based discovery, comparisons, Anime Roulette, favorites, detailed anime information, and an AI assistant in one platform.',
+    stack: [],
+    dataSource: 'Live anime information powered by AniList.',
+    notice: 'AniReco is not an anime streaming or downloading platform. It is designed specifically for anime discovery, recommendations, and information.',
+    searchTerms: ['anime', 'recommendation', 'discovery', 'AniList', 'mood', 'roulette'],
+    features: [
+      'Explore Anime — trending, airing, top-rated, upcoming, and popular titles',
+      'Discover — search and filter by genre, status, format, year, and rating',
+      'For You — personalized recommendations based on preferences and interactions',
+      'Mood Finder — discover Romance, Relaxing, Emotional, Exciting, Thoughtful, and Dark anime',
+      'Anime Match — match selected preferences with anime',
+      'Anime Compare — compare ratings, popularity, genres, episodes, status, and studios',
+      'Anime Roulette — choose preferences and receive a random anime selection',
+      'Favorites — save anime of interest',
+      'Anime Details — titles, posters, ratings, genres, status, episodes, popularity, characters, staff, and recommendations',
+      'AniReco Assistant — ask anime questions, get recommendations, discuss anime, and navigate AniReco',
+    ],
+    learning: 'AniReco explores how multiple discovery methods can make a large anime catalog easier and more enjoyable to navigate while keeping recommendations and useful information at the center of the experience.',
+    seoDescription: 'AniReco is an anime discovery, recommendation, and information platform powered by live anime information from AniList. It is not an anime streaming website.',
+  },
 ];
 
 const featuredProjectSlugs = ['thryve', 'ac-core', 'socconsult'];

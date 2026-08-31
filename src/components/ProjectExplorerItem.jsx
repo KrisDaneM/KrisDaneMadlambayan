@@ -14,7 +14,7 @@ export default function ProjectExplorerItem({ project, index, view }) {
   return <article className={`project-explorer-item project-explorer-item--${view}`}>
     <div className="project-explorer-index"><span>{String(index + 1).padStart(2, '0')}</span><small>{project.category}</small></div>
     <div className="project-explorer-copy"><h2>{project.title}</h2><p>{project.description}</p></div>
-    <div className="project-explorer-stack" aria-label={`${project.title} technology stack`}>{stack.map((technology) => <span key={technology}>{technology}</span>)}</div>
+    <div className="project-explorer-stack" aria-label={`${project.title} technology stack`}>{stack.length ? stack.map((technology) => <span key={technology}>{technology}</span>) : <span>Details pending</span>}</div>
     <div className="project-explorer-type">{project.type}</div>
     <ProjectActions project={project} />
     <span className="project-explorer-line" aria-hidden="true" />
