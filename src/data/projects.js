@@ -17,7 +17,7 @@ export const projects = [
     overview: 'SmartCalc brings commonly needed calculations into one convenient platform, helping users check personal metrics, plan finances, and organize dates without switching between tools.',
     purpose: 'Everyday calculations can be repetitive and scattered across unrelated websites. SmartCalc gathers them into a consistent, approachable experience.',
     solution: 'Calculators are organized into clear categories, use focused inputs, and return immediate results with simple explanations.',
-    stack: ['HTML', 'CSS', 'JavaScript'], liveUrl: 'https://smart-calc-kdm.vercel.app/', cover: asset('calc.webp'),
+    stack: ['React.js', 'JavaScript', 'Tailwind CSS', 'Vite', 'Vitest', 'ESLint'], liveUrl: 'https://smart-calc-kdm.vercel.app/', cover: asset('calc.webp'),
     features: ['Health and fitness calculators', 'Money and budget tools', 'Age calculator', 'Date difference calculator', 'Countdown calculator', 'Work-hours calculator'],
     learning: 'SmartCalc provided practice in input validation, calculation logic, immediate interface feedback, and organizing many small utilities within one coherent system.',
   },
