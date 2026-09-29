@@ -5516,3 +5516,40 @@ main,main > *,main .container,main [class*="grid"],main [class*="layout"],main [
   .contact-terminal-panel.is-success { visibility:visible!important; opacity:1!important; transform:none!important; }
   .contact-orbit-stage.is-success .contact-orbit-success-mark { display:grid!important; opacity:1!important; transform:scale(1)!important; }
 }
+
+/* Lightweight Contact experience for phones and small devices only. */
+@media (max-width:600px) {
+  .contact-terminal { max-width:100%; overflow-x:hidden; }
+  .contact-terminal-composition,.contact-orbit-stage,.contact-orbit-system,.contact-terminal-panel { max-width:100%; }
+  .contact-terminal-rail,.contact-orbit-stage::before,.contact-interaction-boundary,
+  .contact-field-signal,.contact-transmission-overlay,.contact-form-wireframe,
+  .contact-data-capsule,.contact-flight-particle,.contact-energy-head,.contact-flying-plane,
+  .contact-launch-pad,.contact-panel-trace,.contact-panel-progress,
+  .contact-orbit-energy,.contact-orbit-axis,.contact-orbit-response-ring,
+  .contact-orbit-sparks,.contact-orbit-pulses,.contact-orbit-data-icons,
+  .contact-orbit-success-mark,.contact-orbit-captured-plane,
+  .contact-field-spark,.contact-orbit-field-pulse { display:none!important; }
+
+  .contact-orbit-system,.contact-orbit-core,.contact-orbit-equator,
+  .contact-orbit-rotor,.contact-orbit-geometry * { animation:none!important; transition:none!important; }
+  .contact-orbit-system { transform:none!important; }
+  .contact-orbit-core { filter:none!important; transform:none!important; }
+  .contact-orbit-geometry .orbit-ellipse-one { transform:rotate(-14deg); }
+  .contact-orbit-geometry .orbit-ellipse-two { transform:rotate(32deg); }
+  .contact-orbit-equator { transform:rotate(-15deg); }
+  .contact-orbit-rotor { transform:none!important; }
+
+  .contact-terminal-panel.is-ignition,
+  .contact-terminal-panel.is-success,
+  .contact-terminal-panel.is-clearing,
+  .contact-terminal-panel.is-settling { visibility:visible!important; opacity:1!important; filter:none!important; transform:none!important; animation:none!important; }
+  .contact-terminal-panel.is-ignition .contact-terminal-fields,
+  .contact-terminal-panel.is-success .contact-terminal-fields,
+  .contact-terminal-panel.is-clearing .contact-terminal-fields,
+  .contact-terminal-panel.is-settling .contact-terminal-fields { opacity:1; }
+  .contact-terminal-panel.is-clearing .contact-terminal-field input,
+  .contact-terminal-panel.is-clearing .contact-terminal-field textarea,
+  .contact-terminal-panel.is-clearing .contact-field-check,
+  .contact-terminal-submit,.contact-submit-dots b,.contact-status-spinner,
+  .contact-terminal-field.is-active > .contact-field-icon,.contact-field-check { animation:none!important; }
+}

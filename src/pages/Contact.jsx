@@ -12,6 +12,21 @@ const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolv
 const activeStates = new Set(['ignition', 'transmitting', 'absorbing', 'processing', 'success', 'preReturn', 'dataRelease', 'reconstructing', 'materializing', 'reappeared', 'restored', 'clearing', 'settling']);
 const dataPacketIcons = { name: UserRound, email: AtSign, number: Phone, message: MessageSquare };
 
+function useSmallContactDevice() {
+  const query = '(max-width: 600px)';
+  const [matches, setMatches] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const update = (event) => setMatches(event.matches);
+    setMatches(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  return matches;
+}
+
 function ContactDetails({ reduce }) {
   const reveal = (delay) => ({ initial: reduce ? false : { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: .5, delay, ease } });
   return <div className="contact-terminal-details">
@@ -160,7 +175,9 @@ function ContactForm({ activeField, buttonRef, errors, fieldRefs, formRef, onBlu
 }
 
 export default function Contact() {
-  const reduce = useReducedMotion();
+  const prefersReducedMotion = useReducedMotion();
+  const isSmallDevice = useSmallContactDevice();
+  const reduce = prefersReducedMotion || isSmallDevice;
   const formRef = useRef(null);
   const buttonRef = useRef(null);
   const orbitRef = useRef(null);
@@ -244,6 +261,11 @@ export default function Contact() {
   };
 
   useLayoutEffect(() => {
+    if (reduce) {
+      setPath(null);
+      setFieldPath(null);
+      return undefined;
+    }
     let geometryFrame = 0;
     let disposed = false;
     const refresh = () => {
@@ -267,12 +289,13 @@ export default function Contact() {
   }, [reduce, activeField, phase]);
 
   useEffect(() => {
+    if (isSmallDevice) return undefined;
     const section = compositionRef.current;
     if (!section) return undefined;
     const observer = new IntersectionObserver(([entry]) => setInteractionVisible(entry.isIntersecting && entry.intersectionRatio > .05), { threshold: [0, .05, .2] });
     observer.observe(section);
     return () => observer.disconnect();
-  }, []);
+  }, [isSmallDevice]);
 
   useEffect(() => () => { window.cancelAnimationFrame(frameRef.current); sequenceRunRef.current += 1; }, []);
 
@@ -381,5 +404,5 @@ export default function Contact() {
   }
 
   const signalLevel = values.message.length > 100 ? 3 : values.message.length > 40 ? 2 : values.message.length > 0 ? 1 : 0;
-  return <PageShell><SEO title="Contact | Kris Dane Madlambayan" description="Contact Kris Dane Madlambayan to discuss internships, front-end development, web projects, and creative collaboration." /><main className={`contact-terminal${reduce ? ' is-reduced' : ''}`} onPointerMove={handleOrbitPointer} onPointerLeave={resetOrbitPointer}><div className="contact-terminal-grid" aria-hidden="true" /><div className="contact-terminal-rail contact-terminal-rail-left" aria-hidden="true" /><div className="contact-terminal-rail contact-terminal-rail-right" aria-hidden="true" /><section ref={compositionRef} className="container contact-terminal-composition" aria-labelledby="contact-title"><ContactDetails reduce={reduce} /><CommunicationOrbit activeField={activeField} coreRef={coreRef} orbitRef={orbitRef} phase={phase} reduce={reduce} signalLevel={signalLevel} signalToken={signalToken} /><ContactForm activeField={activeField} buttonRef={buttonRef} errors={errors} fieldRefs={fieldRefs} formRef={formRef} onBlurField={handleBlurField} onChangeField={handleChangeField} onFocusField={handleFocusField} onInvalid={handleInvalid} onPhoneChange={handlePhoneChange} onPointerLeave={resetButtonPointer} onPointerMove={handleButtonPointer} onSubmit={submit} panelRef={panelRef} phase={phase} reduce={reduce} resetComplete={resetComplete} resetting={resetting} values={values} /><div className="contact-interaction-boundary" aria-hidden="true"><AnimatePresence>{interactionVisible && activeField && fieldPath && !activeStates.has(phase) && <FieldSignalOverlay activeField={activeField} path={fieldPath} reduce={reduce} token={signalToken} />}{interactionVisible && ['transmitting', 'dataRelease', 'reconstructing'].includes(phase) && path && <DataTransmissionOverlay key={`${phase}-${sequence}`} mode={phase} path={path} reduce={reduce} sequence={sequence} submittedValues={submittedValues} />}{interactionVisible && ['reconstructing', 'materializing'].includes(phase) && path && <FormReconstructionOverlay key={`${phase}-${sequence}-wireframe`} mode={phase} path={path} reduce={reduce} sequence={sequence} />}</AnimatePresence></div></section></main></PageShell>;
+  return <PageShell><SEO title="Contact | Kris Dane Madlambayan" description="Contact Kris Dane Madlambayan to discuss internships, front-end development, web projects, and creative collaboration." /><main className={`contact-terminal${reduce ? ' is-reduced' : ''}${isSmallDevice ? ' is-small-device' : ''}`} onPointerMove={handleOrbitPointer} onPointerLeave={resetOrbitPointer}><div className="contact-terminal-grid" aria-hidden="true" /><div className="contact-terminal-rail contact-terminal-rail-left" aria-hidden="true" /><div className="contact-terminal-rail contact-terminal-rail-right" aria-hidden="true" /><section ref={compositionRef} className="container contact-terminal-composition" aria-labelledby="contact-title"><ContactDetails reduce={reduce} /><CommunicationOrbit activeField={activeField} coreRef={coreRef} orbitRef={orbitRef} phase={phase} reduce={reduce} signalLevel={signalLevel} signalToken={signalToken} /><ContactForm activeField={activeField} buttonRef={buttonRef} errors={errors} fieldRefs={fieldRefs} formRef={formRef} onBlurField={handleBlurField} onChangeField={handleChangeField} onFocusField={handleFocusField} onInvalid={handleInvalid} onPhoneChange={handlePhoneChange} onPointerLeave={resetButtonPointer} onPointerMove={handleButtonPointer} onSubmit={submit} panelRef={panelRef} phase={phase} reduce={reduce} resetComplete={resetComplete} resetting={resetting} values={values} /><div className="contact-interaction-boundary" aria-hidden="true">{!isSmallDevice && <AnimatePresence>{interactionVisible && activeField && fieldPath && !activeStates.has(phase) && <FieldSignalOverlay activeField={activeField} path={fieldPath} reduce={reduce} token={signalToken} />}{interactionVisible && ['transmitting', 'dataRelease', 'reconstructing'].includes(phase) && path && <DataTransmissionOverlay key={`${phase}-${sequence}`} mode={phase} path={path} reduce={reduce} sequence={sequence} submittedValues={submittedValues} />}{interactionVisible && ['reconstructing', 'materializing'].includes(phase) && path && <FormReconstructionOverlay key={`${phase}-${sequence}-wireframe`} mode={phase} path={path} reduce={reduce} sequence={sequence} />}</AnimatePresence>}</div></section></main></PageShell>;
 }
