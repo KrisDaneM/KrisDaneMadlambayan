@@ -17,7 +17,7 @@ import {
   UserRound,
   UserRoundCheck,
 } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   SiAngular,
   SiCloudinary,
@@ -64,10 +64,10 @@ const philosophy = [
 ];
 
 const process = [
-  ['Responsive by default', 'Interfaces should remain useful, readable, and intentional on every screen.'],
-  ['People before patterns', 'Good decisions begin with what a person needs to understand and accomplish.'],
-  ['Clean implementation', 'Structure, consistency, and maintainability matter as much as the visual result.'],
-  ['Always learning', 'I keep exploring tools and approaches where they add genuine value.'],
+  ['Responsive Design', 'I create websites that work well on desktops, tablets, and mobile devices.'],
+  ['User-Friendly Interfaces', 'I design simple and organized interfaces that are easy to navigate and understand.'],
+  ['Clean Development', 'I write clean and organized code to make websites easier to maintain and improve.'],
+  ['Continuous Learning', 'I improve my skills by learning new technologies and applying them to real projects.'],
 ];
 
 const technologyIcons = {
@@ -153,24 +153,6 @@ function SectionLabel({ index, children }) {
   return <p className="about-v3-label"><span>{index}</span>{children}</p>;
 }
 
-function CapabilityArchitecture({ reduce }) {
-  return <motion.div className="about-cap-architecture" initial={reduce ? false : { opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .58, delay: .2, ease }} aria-hidden="true">
-    <svg viewBox="0 0 380 470" focusable="false">
-      <g className="about-cap-architecture-guides">
-        <path d="M190 24V438M42 210H338M76 92L304 342M304 92L76 342" />
-        <ellipse cx="190" cy="382" rx="136" ry="58" /><ellipse cx="190" cy="382" rx="104" ry="42" /><ellipse cx="190" cy="382" rx="73" ry="28" />
-      </g>
-      <g className="about-cap-architecture-stack">
-        {[0, 1, 2, 3, 4].map((layer) => <g key={layer} style={{ '--layer': layer }}>
-          <polygon points={`190,${116 + layer * 49} 286,${168 + layer * 49} 190,${220 + layer * 49} 94,${168 + layer * 49}`} />
-          <path d={`M94 ${168 + layer * 49}V${180 + layer * 49}L190 ${232 + layer * 49}L286 ${180 + layer * 49}V${168 + layer * 49}`} />
-        </g>)}
-      </g>
-      <g className="about-cap-architecture-nodes"><circle cx="42" cy="210" r="3" /><circle cx="338" cy="210" r="3" /><circle cx="190" cy="24" r="3" /><circle cx="190" cy="438" r="3" /><circle cx="77" cy="93" r="2" /><circle cx="303" cy="93" r="2" /></g>
-    </svg>
-  </motion.div>;
-}
-
 function InterfacePreview({ size, type }) {
   return <div className={`about-fe-device about-fe-device--${type}`}>
     <div><i /><span /><span /><b /></div>
@@ -247,6 +229,7 @@ function FrontendSystem({ reduce }) {
 export default function About() {
   const reduce = useReducedMotion();
   const [activeSection, setActiveSection] = useState('about');
+  const [openCapability, setOpenCapability] = useState(null);
 
   const reveal = (delay = 0) => reduce ? {} : {
     initial: { opacity: 0, y: 12 },
@@ -334,8 +317,7 @@ export default function About() {
           <div className="container about-process-layout">
             <motion.header className="about-process-intro" {...reveal()}>
               <SectionLabel index="04">PROCESS</SectionLabel>
-              <h2>A considered route from screen to system.</h2>
-              <p>Each decision moves from understanding the screen and its users toward a clear, maintainable result.</p>
+              <h2>How I build better websites.</h2>
             </motion.header>
             <div className="about-process-track">
               <motion.i className="about-process-rail" aria-hidden="true" initial={reduce ? false : { scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .62, delay: .1, ease }} />
@@ -359,7 +341,6 @@ export default function About() {
                 <motion.i className="about-toolkit-guide" aria-hidden="true" initial={reduce ? false : { opacity: 0, scaleY: 0 }} whileInView={{ opacity: 1, scaleY: 1 }} viewport={{ once: true, amount: .08 }} transition={{ duration: .55, delay: .12, ease }}><b /><span /></motion.i>
                 <p className="about-toolkit-kicker"><span>01</span>TOOLKIT</p>
                 <h2><span>Tools I use to</span><span>turn ideas into</span><em>responsive</em><em>digital</em><em>experiences.</em></h2>
-                <p>Organized around the work they support, from interface design and front-end implementation to application foundations and delivery.</p>
               </motion.header>
               <div className="about-toolkit-primary">
                 {toolkitGroups.slice(0, 2).map((group, groupIndex) => <motion.article className={`about-toolkit-group about-toolkit-group--${group.id}`} key={group.id} {...reveal(.12 + groupIndex * .1)}>
@@ -387,10 +368,6 @@ export default function About() {
             <motion.header className="about-cap-intro" {...reveal()}>
               <p className="about-cap-kicker"><span>02</span><i>//</i> CAPABILITIES</p>
               <h2><span>Capabilities</span><span>shaped by</span><em>real projects</em><em>and practical</em><em>work.</em></h2>
-              <p className="about-cap-summary">I combine clean implementation, thoughtful interaction, and attention to detail to build digital experiences that are useful, usable, and built to last.</p>
-              <CapabilityArchitecture reduce={reduce} />
-              <a className="about-cap-approach" href="#philosophy"><i aria-hidden="true" />MY APPROACH <ArrowRight aria-hidden="true" /></a>
-              <span className="about-cap-intro-guide" aria-hidden="true"><i /></span>
             </motion.header>
 
             <div className="about-cap-network">
@@ -398,18 +375,29 @@ export default function About() {
                 <motion.i className="about-cap-timeline" aria-hidden="true" initial={reduce ? false : { scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={{ once: true, amount: .05 }} transition={{ duration: .82, delay: .08, ease }} />
                 {capabilityMap.map((capability, index) => {
                   const CapabilityIcon = capabilityIcons[index];
-                  return <motion.article className={`about-cap-item about-cap-item--${index + 1}${capability.primary ? ' is-primary' : ''}`} key={capability.title} {...reveal(.2 + index * .08)}>
-                    <div className="about-cap-index"><strong>{String(index + 1).padStart(2, '0')}</strong><span><CapabilityIcon aria-hidden="true" /></span></div>
-                    <div className="about-cap-copy">
-                      {capability.status && <small>{capability.status}</small>}
-                      <h3>{capability.title}</h3>
-                      <p>{capability.description}</p>
-                      <ul aria-label={`${capability.title} technologies`}>{capability.technologies.map((technology) => <li key={technology}>{technology}</li>)}</ul>
-                    </div>
-                    <div className="about-cap-work">
-                      <small>RELATED WORK</small>
-                      {capability.projects.map((project) => <Link key={project.slug} to={`/projects/${project.slug}`}>{project.title}<ArrowRight aria-hidden="true" /></Link>)}
-                    </div>
+                  const expanded = openCapability === index;
+                  const detailsId = `capability-details-${index + 1}`;
+                  return <motion.article className={`about-cap-item about-cap-accordion-item about-cap-item--${index + 1}${capability.primary ? ' is-primary' : ''}${expanded ? ' is-expanded' : ''}`} key={capability.title} {...reveal(.2 + index * .08)}>
+                    <button className="about-cap-toggle" type="button" aria-expanded={expanded} aria-controls={detailsId} onClick={() => setOpenCapability(expanded ? null : index)}>
+                      <span className="about-cap-index"><strong>{String(index + 1).padStart(2, '0')}</strong><span><CapabilityIcon aria-hidden="true" /></span></span>
+                      <span className="about-cap-toggle-title">{capability.title}</span>
+                      <span className="about-cap-toggle-indicator" aria-hidden="true"><i /><i /></span>
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {expanded && <motion.div id={detailsId} className="about-cap-details" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: reduce ? 0 : .3, ease }}>
+                        <div className="about-cap-details-inner">
+                          <div className="about-cap-copy">
+                            {capability.status && <small>{capability.status}</small>}
+                            <p>{capability.description}</p>
+                            <ul aria-label={`${capability.title} technologies`}>{capability.technologies.map((technology) => <li key={technology}>{technology}</li>)}</ul>
+                          </div>
+                          <div className="about-cap-work">
+                            <small>RELATED WORK</small>
+                            {capability.projects.map((project, projectIndex) => <motion.div key={project.slug} initial={reduce ? false : { opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .24, delay: projectIndex * .045, ease }}><Link to={`/projects/${project.slug}`}>{project.title}<ArrowRight aria-hidden="true" /></Link></motion.div>)}
+                          </div>
+                        </div>
+                      </motion.div>}
+                    </AnimatePresence>
                   </motion.article>;
                 })}
               </div>

@@ -8,7 +8,6 @@ import PageShell from '../components/PageShell';
 import Reveal from '../components/Reveal';
 import SEO from '../components/SEO';
 import { featuredProjects } from '../data/projects';
-import { currentFocus, resumeProfile } from '../data/resume';
 
 const ease = [0.22, 1, 0.36, 1];
 const HANDOFF_EVENT = 'kdm:splash-home-handoff';
@@ -57,16 +56,6 @@ function HeroOrbit({ reduce, orbitRef, portalEntry }) {
             animate={reduce ? { opacity: .24, scale: 1 } : { opacity: [0, .42, 0], scale: [1, 1.035, 1.04] }}
             transition={{ duration: .38, delay: 1.18, ease }}
           />
-          <div className="home-hero-core-position">
-            <motion.div
-              className="home-hero-core-entry"
-              initial={reduce ? false : { opacity: 0, scale: .88 }}
-              animate={{ opacity: .9, scale: 1 }}
-              transition={{ duration: .48, delay: .2, ease }}
-            >
-              <div className="home-hero-core-breath"><i /><b /><em className="home-hero-core-lock-flash" /></div>
-            </motion.div>
-          </div>
         </div>
       </motion.div>
     </div>
@@ -189,14 +178,14 @@ export default function Home() {
         </div>
       </section>
       <LiveMetrics />
-      <section className="home-r-section home-r-philosophy"><div className="container home-r-philosophy-grid"><motion.div {...reveal()}><Label number="01">PHILOSOPHY</Label><h2><em>code</em> becomes<br />experience.</h2><p>{resumeProfile.summary}</p></motion.div><motion.div className="home-r-principles" {...reveal(.08)}>{['Professional first. Creative with intent.', 'Continuous learning through practical projects and coursework.', 'Clean implementation and user-centered design.', currentFocus[2]].map((item) => <p key={item}><i />{item}</p>)}</motion.div></div></section>
+      <section className="home-r-section home-r-philosophy"><div className="container home-r-philosophy-grid"><motion.div {...reveal()}><Label number="01">PHILOSOPHY</Label><h2><em>code</em> becomes<br />experience.</h2><p>I develop responsive and user-friendly websites and web applications. I focus on clean design, smooth functionality, and creating digital experiences that are simple, accessible, and easy to use.</p></motion.div><motion.div className="home-r-principles" {...reveal(.08)}>{['Professional work with a creative approach.', 'Always learning through projects and studies.', 'Building clean and easy-to-use websites.', 'Improving my TypeScript, API, and database skills.'].map((item) => <p key={item}><i />{item}</p>)}</motion.div></div></section>
       <section className="home-r-section home-r-work"><div className="container"><div className="home-r-heading"><Label number="02">SELECTED WORK</Label><Link to="/projects">VIEW ALL PROJECTS <ArrowRight /></Link></div><div className="home-r-projects">{featuredProjects.map((project, index) => <Reveal as="article" key={project.slug} delay={index * .06} distance={10}><span className="home-r-project-initial">{project.title.charAt(0)}</span><div><h3>{project.title}</h3><p>{project.featuredDescription || project.description}</p></div><div className="home-r-project-stack"><small>STACK</small><p>{(project.featuredStack || project.stack).join(' · ')}</p></div><Link to={`/projects/${project.slug}`}>CASE STUDY <ArrowRight /></Link></Reveal>)}</div></div></section>
       <section className="home-r-section home-r-capabilities home-teaser home-capabilities-teaser">
         <div className="container home-teaser-layout">
           <motion.div className="home-teaser-copy" {...reveal(0, .08)}>
             <Label number="03">CAPABILITIES</Label>
-            <h2>Front-end focused.<br /><em>Built to grow.</em></h2>
-            <p>Responsive interfaces and thoughtful interaction come first, supported by growing application and back-end foundations.</p>
+            <h2>Focused on front-end development.<br /><em>Growing with every project.</em></h2>
+            <p>I create responsive and easy-to-use websites while improving my development skills through hands-on experience and continuous learning.</p>
             <Link className="home-teaser-link" to="/about#capabilities">VIEW CAPABILITIES <ArrowRight /></Link>
           </motion.div>
           <motion.div className="home-capabilities-preview" {...reveal(.08, .08)} aria-hidden="true">

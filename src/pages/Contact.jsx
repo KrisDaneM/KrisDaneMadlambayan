@@ -1,4 +1,3 @@
-import emailjs from '@emailjs/browser';
 import { AlertCircle, AtSign, Check, CheckCircle2, Mail, MapPin, MessageSquare, Phone, Send, UserRound } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -11,6 +10,15 @@ const ease = [0.22, 1, 0.36, 1];
 const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 const activeStates = new Set(['ignition', 'transmitting', 'absorbing', 'processing', 'success', 'preReturn', 'dataRelease', 'reconstructing', 'materializing', 'reappeared', 'restored', 'clearing', 'settling']);
 const dataPacketIcons = { name: UserRound, email: AtSign, number: Phone, message: MessageSquare };
+
+function retryMessage(seconds) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return "You've reached the message limit. Please try again later.";
+  const hours = Math.ceil(seconds / 3600);
+  if (hours >= 24) return "You've reached the daily limit of 5 messages. Please try again in 24 hours.";
+  if (hours >= 1) return `You've reached the message limit. You can send another message in ${hours} ${hours === 1 ? 'hour' : 'hours'}.`;
+  const minutes = Math.max(1, Math.ceil(seconds / 60));
+  return `Please wait ${minutes} ${minutes === 1 ? 'minute' : 'minutes'} before trying again.`;
+}
 
 function useSmallContactDevice() {
   const query = '(max-width: 600px)';
@@ -149,7 +157,7 @@ function ContactField({ active, children, error, fieldRef, icon: Icon, id, label
   return <div ref={fieldRef} className={`contact-terminal-field${active ? ' is-active' : ''}${valid ? ' is-valid' : ''}${error ? ' has-error' : ''}`}><label className="sr-only" htmlFor={id}>{label}</label><Icon className="contact-field-icon" aria-hidden="true" />{children}{valid && <Check className="contact-field-check" aria-hidden="true" />}{active && <i className="contact-field-spark" aria-hidden="true" />}{error && <small id={`${id}-error`}><AlertCircle aria-hidden="true" />{error}</small>}</div>;
 }
 
-function ContactForm({ activeField, buttonRef, errors, fieldRefs, formRef, onBlurField, onChangeField, onFocusField, onInvalid, onPhoneChange, onPointerLeave, onPointerMove, onSubmit, panelRef, phase, reduce, resetComplete, resetting, values }) {
+function ContactForm({ activeField, buttonRef, errors, feedback, fieldRefs, formRef, onBlurField, onChangeField, onFocusField, onInvalid, onPhoneChange, onPointerLeave, onPointerMove, onSubmit, panelRef, phase, reduce, remaining, resetComplete, resetting, values }) {
   const locked = activeStates.has(phase);
   const successful = ['success', 'preReturn', 'dataRelease', 'reconstructing', 'materializing', 'reappeared', 'restored'].includes(phase);
   const resettingToIdle = ['clearing', 'settling'].includes(phase);
@@ -162,14 +170,15 @@ function ContactForm({ activeField, buttonRef, errors, fieldRefs, formRef, onBlu
     <svg className="contact-panel-trace" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon className="contact-panel-trace-glow" points="0,0 95,0 100,5 100,95 95,100 5,100 0,95" pathLength="1" /><polygon className="contact-panel-trace-core" points="0,0 95,0 100,5 100,95 95,100 5,100 0,95" pathLength="1" /></svg>
     <header><p><i />MESSAGE CHANNEL</p><span className={`is-${phase}`}><i />{statusText}</span></header><h2>Send a message.</h2><p className="contact-panel-intro">Share your idea, question, or opportunity.</p>
     <form ref={formRef} onSubmit={onSubmit} onInvalid={onInvalid} aria-busy={activeStates.has(phase)}>
+      <div className="contact-honeypot" aria-hidden="true"><label htmlFor="contact-website">Website</label><input id="contact-website" name="website" type="text" tabIndex="-1" autoComplete="off" value={values.website} onChange={(event) => onChangeField('website', event.target.value)} /></div>
       <div className="contact-terminal-fields">
         <ContactField id="contact-name" label="Your name" icon={UserRound} error={errors.name} active={activeField === 'name'} valid={values.name.trim().length > 1} fieldRef={(node) => { fieldRefs.current.name = node; }}><input id="contact-name" type="text" name="name" data-label="Name" autoComplete="name" placeholder="Your name" required disabled={locked} value={values.name} onFocus={() => onFocusField('name')} onBlur={onBlurField} onChange={(event) => onChangeField('name', event.target.value, event.target)} aria-invalid={errors.name ? 'true' : undefined} aria-describedby={errors.name ? 'contact-name-error' : undefined} /></ContactField>
         <ContactField id="contact-email" label="Email address" icon={AtSign} error={errors.email} active={activeField === 'email'} valid={/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)} fieldRef={(node) => { fieldRefs.current.email = node; }}><input id="contact-email" type="email" name="email" data-label="Email" autoComplete="email" placeholder="Email address" required disabled={locked} value={values.email} onFocus={() => onFocusField('email')} onBlur={onBlurField} onChange={(event) => onChangeField('email', event.target.value, event.target)} aria-invalid={errors.email ? 'true' : undefined} aria-describedby={errors.email ? 'contact-email-error' : undefined} /></ContactField>
         <ContactField id="contact-number" label="Phone number (optional)" icon={Phone} error={errors.number} active={activeField === 'phone'} valid={values.number.length >= 7} fieldRef={(node) => { fieldRefs.current.phone = node; }}><input id="contact-number" type="tel" inputMode="numeric" pattern="[0-9]*" name="number" data-label="Phone number" autoComplete="tel" placeholder="Phone number (optional)" disabled={locked} value={values.number} onFocus={() => onFocusField('phone')} onBlur={onBlurField} onChange={onPhoneChange} aria-invalid={errors.number ? 'true' : undefined} aria-describedby={errors.number ? 'contact-number-error' : undefined} /></ContactField>
         <ContactField id="contact-message" label="Your message" icon={MessageSquare} error={errors.message} active={activeField === 'message'} valid={values.message.trim().length > 0} fieldRef={(node) => { fieldRefs.current.message = node; }}><textarea id="contact-message" name="message" data-label="Message" rows="6" placeholder="Tell me about your idea or opportunity..." required disabled={locked} value={values.message} onFocus={() => onFocusField('message')} onBlur={onBlurField} onChange={(event) => onChangeField('message', event.target.value, event.target)} aria-invalid={errors.message ? 'true' : undefined} aria-describedby={errors.message ? 'contact-message-error' : undefined} /></ContactField>
       </div>
-      <div className="contact-terminal-submit-row"><div className="contact-launch-pad" aria-hidden="true"><i /><i /><b /><b /><b /></div><button ref={buttonRef} className={`contact-terminal-submit is-${phase}`} type="submit" disabled={activeStates.has(phase)} aria-busy={busy} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}><span>{buttonText}</span>{successful ? <Check aria-hidden="true" /> : busy ? <i className="contact-submit-dots" aria-hidden="true"><b /><b /><b /></i> : <Send aria-hidden="true" />}</button><div className="contact-terminal-status" aria-hidden="true">{busy && <i className="contact-status-spinner" />}{successful && <CheckCircle2 />}{phase === 'error' && <AlertCircle />}<p>{successful ? <>Message delivered.<small>I&apos;ll get back to you as soon as I can.</small></> : busy ? <>{activityCopy}<small>This won&apos;t take long.</small></> : phase === 'error' ? <>Message couldn&apos;t be sent.<small>Please try again.</small></> : <>I&apos;ll get back to you as soon as I can.</>}</p></div></div>
-      <p className="sr-only" role="status" aria-live="polite">{successful ? "Message sent successfully. I'll get back to you as soon as I can." : phase === 'error' ? 'Message could not be sent. Please try again.' : busy ? 'Sending message.' : ''}</p>
+      <div className="contact-terminal-submit-row"><div className="contact-launch-pad" aria-hidden="true"><i /><i /><b /><b /><b /></div><button ref={buttonRef} className={`contact-terminal-submit is-${phase}`} type="submit" disabled={activeStates.has(phase)} aria-busy={busy} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}><span>{buttonText}</span>{successful ? <Check aria-hidden="true" /> : busy ? <i className="contact-submit-dots" aria-hidden="true"><b /><b /><b /></i> : <Send aria-hidden="true" />}</button><div className="contact-terminal-status">{busy && <i className="contact-status-spinner" />}{successful && <CheckCircle2 />}{phase === 'error' && <AlertCircle />}<p>{successful ? <>Message delivered.<small>{remaining === 0 ? 'Daily message limit reached.' : `${remaining} ${remaining === 1 ? 'message' : 'messages'} remaining today.`}</small></> : busy ? <>{activityCopy}<small>This won&apos;t take long.</small></> : phase === 'error' ? <>Message couldn&apos;t be sent.<small>{feedback || 'Please try again.'}</small></> : <>{remaining == null ? "I'll get back to you as soon as I can." : remaining === 0 ? 'Daily message limit reached.' : `${remaining} ${remaining === 1 ? 'message' : 'messages'} remaining today.`}</>}</p></div></div>
+      <p className="sr-only" role="status" aria-live="polite">{successful ? `Message sent successfully. ${remaining ?? 0} messages remaining today.` : phase === 'error' ? feedback || 'Message could not be sent. Please try again.' : busy ? 'Sending message.' : ''}</p>
     </form>
   </motion.div>;
 }
@@ -194,12 +203,14 @@ export default function Contact() {
   const [fieldPath, setFieldPath] = useState(null);
   const [activeField, setActiveField] = useState(null);
   const [signalToken, setSignalToken] = useState(0);
-  const [values, setValues] = useState({ name: '', email: '', number: '', message: '' });
+  const [values, setValues] = useState({ name: '', email: '', number: '', message: '', website: '' });
   const [submittedValues, setSubmittedValues] = useState({ name: '', email: '', number: '', message: '' });
   const [sequence, setSequence] = useState(0);
   const [resetting, setResetting] = useState(false);
   const [resetComplete, setResetComplete] = useState(false);
   const [interactionVisible, setInteractionVisible] = useState(true);
+  const [feedback, setFeedback] = useState('');
+  const [remaining, setRemaining] = useState(null);
 
   const calculatePath = () => {
     if (reduce || !compositionRef.current || !coreRef.current || !panelRef.current) { setPath(null); return; }
@@ -328,7 +339,7 @@ export default function Contact() {
   };
   const handleBlurField = () => setActiveField(null);
   const handleChangeField = (fieldName, value) => {
-    if (phase === 'error') setPhase('idle');
+    if (phase === 'error') { setPhase('idle'); setFeedback(''); }
     setValues((current) => ({ ...current, [fieldName]: value }));
     if (errors[fieldName]) setErrors((current) => { const next = { ...current }; delete next[fieldName]; return next; });
     triggerFieldSignal(fieldName);
@@ -338,7 +349,6 @@ export default function Contact() {
   async function submit(event) {
     event.preventDefault();
     if (activeStates.has(phase)) return;
-    if (!emailjs?.sendForm) { setPhase('error'); return; }
     calculatePath();
     resetButtonPointer();
     setResetting(false);
@@ -346,17 +356,33 @@ export default function Contact() {
     setActiveField(null);
     setFieldPath(null);
     setSubmittedValues({ ...values });
+    setFeedback('');
     setPhase('ignition');
     setSequence((current) => current + 1);
     const runId = ++sequenceRunRef.current;
-    const request = emailjs.sendForm('service_su6pyfv', 'template_fq7byqe', formRef.current, { publicKey: 'r0Ke9SEJtUOKvP8xw' }).then(() => true, () => false);
+    const request = fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    }).then(async (response) => {
+      let data = {};
+      try { data = await response.json(); } catch { /* Use the safe fallback below. */ }
+      return { delivered: response.ok && data.success, data, status: response.status };
+    }).catch(() => ({ delivered: false, data: {}, status: 0 }));
     const advance = async (nextPhase, duration) => { if (sequenceRunRef.current !== runId) return false; setPhase(nextPhase); await wait(duration); return sequenceRunRef.current === runId; };
 
+    const handleFailedRequest = ({ data, status }) => {
+      if (status === 429 && data.code === 'CONTACT_RATE_LIMITED') setFeedback(retryMessage(Number(data.retryAfterSeconds)));
+      else setFeedback(data.message || 'The message service is temporarily unavailable. Please try again later.');
+      setPhase('error');
+    };
+
     if (reduce) {
-      const delivered = await request;
+      const result = await request;
       if (sequenceRunRef.current !== runId) return;
-      setPhase(delivered ? 'success' : 'error');
-      if (!delivered) return;
+      if (!result.delivered) { handleFailedRequest(result); return; }
+      setRemaining(Number.isFinite(result.data.remaining) ? result.data.remaining : null);
+      setPhase('success');
       setErrors({});
       await wait(1700);
     } else {
@@ -364,9 +390,10 @@ export default function Contact() {
       if (!await advance('transmitting', 950)) return;
       if (!await advance('absorbing', 520)) return;
       if (!await advance('processing', 720)) return;
-      const delivered = await request;
+      const result = await request;
       if (sequenceRunRef.current !== runId) return;
-      if (!delivered) { setPhase('error'); return; }
+      if (!result.delivered) { handleFailedRequest(result); return; }
+      setRemaining(Number.isFinite(result.data.remaining) ? result.data.remaining : null);
       if (!await advance('success', 720)) return;
       if (!await advance('preReturn', 100)) return;
       if (!await advance('dataRelease', 200)) return;
@@ -392,7 +419,7 @@ export default function Contact() {
     }
     if (sequenceRunRef.current !== runId) return;
     formRef.current?.reset();
-    setValues({ name: '', email: '', number: '', message: '' });
+    setValues({ name: '', email: '', number: '', message: '', website: '' });
     setSubmittedValues({ name: '', email: '', number: '', message: '' });
     setResetting(false);
     setResetComplete(true);
@@ -404,5 +431,5 @@ export default function Contact() {
   }
 
   const signalLevel = values.message.length > 100 ? 3 : values.message.length > 40 ? 2 : values.message.length > 0 ? 1 : 0;
-  return <PageShell><SEO title="Contact | Kris Dane Madlambayan" description="Contact Kris Dane Madlambayan to discuss internships, front-end development, web projects, and creative collaboration." /><main className={`contact-terminal${reduce ? ' is-reduced' : ''}${isSmallDevice ? ' is-small-device' : ''}`} onPointerMove={handleOrbitPointer} onPointerLeave={resetOrbitPointer}><div className="contact-terminal-grid" aria-hidden="true" /><div className="contact-terminal-rail contact-terminal-rail-left" aria-hidden="true" /><div className="contact-terminal-rail contact-terminal-rail-right" aria-hidden="true" /><section ref={compositionRef} className="container contact-terminal-composition" aria-labelledby="contact-title"><ContactDetails reduce={reduce} /><CommunicationOrbit activeField={activeField} coreRef={coreRef} orbitRef={orbitRef} phase={phase} reduce={reduce} signalLevel={signalLevel} signalToken={signalToken} /><ContactForm activeField={activeField} buttonRef={buttonRef} errors={errors} fieldRefs={fieldRefs} formRef={formRef} onBlurField={handleBlurField} onChangeField={handleChangeField} onFocusField={handleFocusField} onInvalid={handleInvalid} onPhoneChange={handlePhoneChange} onPointerLeave={resetButtonPointer} onPointerMove={handleButtonPointer} onSubmit={submit} panelRef={panelRef} phase={phase} reduce={reduce} resetComplete={resetComplete} resetting={resetting} values={values} /><div className="contact-interaction-boundary" aria-hidden="true">{!isSmallDevice && <AnimatePresence>{interactionVisible && activeField && fieldPath && !activeStates.has(phase) && <FieldSignalOverlay activeField={activeField} path={fieldPath} reduce={reduce} token={signalToken} />}{interactionVisible && ['transmitting', 'dataRelease', 'reconstructing'].includes(phase) && path && <DataTransmissionOverlay key={`${phase}-${sequence}`} mode={phase} path={path} reduce={reduce} sequence={sequence} submittedValues={submittedValues} />}{interactionVisible && ['reconstructing', 'materializing'].includes(phase) && path && <FormReconstructionOverlay key={`${phase}-${sequence}-wireframe`} mode={phase} path={path} reduce={reduce} sequence={sequence} />}</AnimatePresence>}</div></section></main></PageShell>;
+  return <PageShell><SEO title="Contact | Kris Dane Madlambayan" description="Contact Kris Dane Madlambayan to discuss internships, front-end development, web projects, and creative collaboration." /><main className={`contact-terminal${reduce ? ' is-reduced' : ''}${isSmallDevice ? ' is-small-device' : ''}`} onPointerMove={handleOrbitPointer} onPointerLeave={resetOrbitPointer}><div className="contact-terminal-grid" aria-hidden="true" /><div className="contact-terminal-rail contact-terminal-rail-left" aria-hidden="true" /><div className="contact-terminal-rail contact-terminal-rail-right" aria-hidden="true" /><section ref={compositionRef} className="container contact-terminal-composition" aria-labelledby="contact-title"><ContactDetails reduce={reduce} /><CommunicationOrbit activeField={activeField} coreRef={coreRef} orbitRef={orbitRef} phase={phase} reduce={reduce} signalLevel={signalLevel} signalToken={signalToken} /><ContactForm activeField={activeField} buttonRef={buttonRef} errors={errors} feedback={feedback} fieldRefs={fieldRefs} formRef={formRef} onBlurField={handleBlurField} onChangeField={handleChangeField} onFocusField={handleFocusField} onInvalid={handleInvalid} onPhoneChange={handlePhoneChange} onPointerLeave={resetButtonPointer} onPointerMove={handleButtonPointer} onSubmit={submit} panelRef={panelRef} phase={phase} reduce={reduce} remaining={remaining} resetComplete={resetComplete} resetting={resetting} values={values} /><div className="contact-interaction-boundary" aria-hidden="true">{!isSmallDevice && <AnimatePresence>{interactionVisible && activeField && fieldPath && !activeStates.has(phase) && <FieldSignalOverlay activeField={activeField} path={fieldPath} reduce={reduce} token={signalToken} />}{interactionVisible && ['transmitting', 'dataRelease', 'reconstructing'].includes(phase) && path && <DataTransmissionOverlay key={`${phase}-${sequence}`} mode={phase} path={path} reduce={reduce} sequence={sequence} submittedValues={submittedValues} />}{interactionVisible && ['reconstructing', 'materializing'].includes(phase) && path && <FormReconstructionOverlay key={`${phase}-${sequence}-wireframe`} mode={phase} path={path} reduce={reduce} sequence={sequence} />}</AnimatePresence>}</div></section></main></PageShell>;
 }
